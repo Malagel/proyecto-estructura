@@ -14,41 +14,41 @@ cd universidad
 
 1) Configurar usuario y correo en el terminal de Ubuntu con:
 
-git config --global user.name "Nombre Apellido"
-git config --global user.email "correo@gay.com"
+    git config --global user.name "Nombre Apellido"
+    git config --global user.email "correo@gay.com"
 
 2) Copiar el código de github con los siguientes comandos en el terminal:
 
-git clone https://github.com/Malagel/proyecto-estructura
-cd proyecto-estructura
-code . 
+    git clone https://github.com/Malagel/proyecto-estructura
+    cd proyecto-estructura
+    code . 
 
 3) Se abrirá VS Code, dentro de él escribir este comando para autenticarse con GitHub:
 
-git fetch origin
+    git fetch origin
 
 ## Flow general de trabajo:
 
 1) Antes de trabajar en una nueva branch usar estos comandos para actualizar tu código:
 
-git checkout main
-git pull origin main
+    git checkout main
+    git pull origin main
 
 2) Después de actualizar el código, irse a la página de GitHub y escoger algún Issue pendiente, moverlo a In Progress y crear una nueva branch. Para moverte a la nueva branch usar:
 
-git fetch origin
-git checkout <nombre-branch>
+    git fetch origin
+    git checkout <nombre-branch>
 
 3) Si mientras están trabajando en el código, se actualiza main, entonces usar estos comandos para actualizar el tuyo:
 
-git fetch origin
-git merge origin/main
+    git fetch origin
+    git merge origin/main
 
 4) Cuando terminen y hayan probado el código en su branch respectiva, usar estos comandos para subirlos a GitHub:
 
-git add .
-git commit -m "Algún comentario especificando qué hicieron"
-git push origin HEAD
+    git add .
+    git commit -m "Algún comentario especificando qué hicieron"
+    git push origin HEAD
 
 5) El código ahora estará actualizado en la branch que crearon. Si están seguros que funciona bien y debería de unirse con el código principal deberán ir a GitHub (o apretar el link que les sale en el terminal después de hacer git push) para crear una Pull Request, que de ser aceptada se mezclará con el código en main.
 
