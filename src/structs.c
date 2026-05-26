@@ -27,8 +27,8 @@ struct Zona{
     int codigo;
     char *nombre;
     char *tematica;
-    struct tiempo *hora_apertura;
-    struct tiempo *hora_cierre;
+    struct Tiempo *hora_apertura;
+    struct Tiempo *hora_cierre;
     int atracciones_max;
     struct NodoAtraccion *head_atracciones;
 };
