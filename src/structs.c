@@ -1,6 +1,6 @@
 struct Parque {
     int cap_max;
-    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado alfabéticamente */
+    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado por rut */
 };
 
 struct NodoVisitantes {
@@ -11,7 +11,7 @@ struct NodoVisitantes {
 struct Visitante {
     char *nombre;
     char *rut;
-    char *tipo;
+    char *tipo; 
     struct Entradas *entrada;
 };
 
