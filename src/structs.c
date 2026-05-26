@@ -1,21 +1,21 @@
-struct Parque{
+struct Parque {
     int cap_max;
-    struct NodoVisitantes *head_visitante;
+    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado alfabéticamente */
 };
 
-struct NodoVisitantes{
+struct NodoVisitantes {
     struct Visitante *v;
-    struct NodoVisitantes *sig;
+    struct NodoVisitantes *izq, *der;
 };
 
-struct Visitante{
-    char *tipo;
+struct Visitante {
     char *nombre;
     char *rut;
+    char *tipo;
     struct Entradas *entrada;
 };
 
-struct Entradas{
+struct Entradas {
     int codigo;
     char *tipo;
     int valor;
@@ -23,7 +23,7 @@ struct Entradas{
     char *fecha_ingreso;
 };
 
-struct Zona{
+struct Zona {
     int codigo;
     char *nombre;
     char *tematica;
@@ -33,17 +33,17 @@ struct Zona{
     struct NodoAtraccion *head_atracciones;
 };
 
-struct Tiempo{
+struct Tiempo {
     int hora;
     int minutos;
 };
 
-struct NodoAtraccion{
+struct NodoAtraccion {
     struct Atraccion *datos;
     struct NodoAtraccion *sig;
 };
 
-struct Atracción{
+struct Atracción {
     char *nombre;
     int capacidad;
     int duracion;
@@ -53,12 +53,12 @@ struct Atracción{
     struct Fila *cola_ricos;
 };
 
-struct NodoFila{
+struct NodoFila {
     int id_visitante;
     struct NodoFila *sig;
 };
 
-struct Fila{
+struct Fila {
     struct NodoFila *frente;
     struct NodoFila *final;
 };
