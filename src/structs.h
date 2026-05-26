@@ -1,12 +1,21 @@
+#ifndef STRUCTS_H
+#define STRUCT_H
+
 struct Parque {
     int cap_max;
     struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado por rut */
+    struct NodoEntradas *head_entradas; /* Simplemente enlazada */
     struct NodoZonas *head_zonas; /* Simplemente enlazada */
 };
 
 struct NodoVisitantes {
     struct Visitante *datos;
     struct NodoVisitantes *izq, *der;
+};
+
+struct NodoEntradas {
+    struct Entrada *entrada;
+    struct NodoEntradas *sig;
 };
 
 struct Visitante {
@@ -85,3 +94,5 @@ struct Fila {
     struct NodoFila *frente;
     struct NodoFila *final;
 };
+
+#endif
