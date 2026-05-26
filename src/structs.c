@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 struct Parque{
     int cap_max;
     struct NodoVisitantes *headVisitante;
@@ -40,7 +38,6 @@ struct tiempo{
     int minutos;
 };
 
-
 struct NodoAtraccion{
     struct Atraccion *datos;
     struct NodoAtraccion *sig;
@@ -65,4 +62,3 @@ struct Fila{
     struct NodoFila *frente;
     struct NodoFila *final;
 };
-
