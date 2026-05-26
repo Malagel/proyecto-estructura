@@ -1,5 +1,5 @@
 #ifndef STRUCTS_H
-#define STRUCT_H
+#define STRUCTS_H
 
 struct Parque {
     int cap_max;
