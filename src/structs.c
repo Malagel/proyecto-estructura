@@ -16,16 +16,16 @@ struct Visitante{
 };
 
 struct Entradas{
-    char *tipo;
     int codigo;
+    char *tipo;
     int valor;
     char *estado;
     char *fecha_ingreso;
 };
 
 struct Zona{
-    char *nombre;
     int codigo;
+    char *nombre;
     char *tematica;
     struct tiempo *hora_apertura;
     struct tiempo *hora_cierre;
