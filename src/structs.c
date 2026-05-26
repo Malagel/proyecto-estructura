@@ -1,39 +1,39 @@
 struct Parque{
     int cap_max;
-    struct NodoVisitantes *headVisitante;
+    struct NodoVisitantes *head_visitante;
 };
 
 struct NodoVisitantes{
-    struct visitante *V;
+    struct Visitante *v;
     struct NodoVisitantes *sig;
 };
 
-struct visitante{
+struct Visitante{
     char *tipo;
     char *nombre;
     char *rut;
-    struct entradas *entrada;
+    struct Entradas *entrada;
 };
 
-struct entradas{
+struct Entradas{
     char *tipo;
     int codigo;
     int valor;
     char *estado;
-    char *fechaIngreso;
+    char *fecha_ingreso;
 };
 
 struct Zona{
     char *nombre;
     int codigo;
     char *tematica;
-    struct tiempo *horaApertura;
-    struct tiempo *horaCierre;
+    struct tiempo *hora_apertura;
+    struct tiempo *hora_cierre;
     int atracciones_max;
-    struct NodoAtraccion *headAtracciones;
+    struct NodoAtraccion *head_atracciones;
 };
 
-struct tiempo{
+struct Tiempo{
     int hora;
     int minutos;
 };
@@ -49,12 +49,12 @@ struct Atracción{
     int duracion;
     float altura;
     int edad;
-    struct Fila *colaPobres;
-    struct Fila *colaRicos;
+    struct Fila *cola_pobres;
+    struct Fila *cola_ricos;
 };
 
 struct NodoFila{
-    int idvisitante;
+    int id_visitante;
     struct NodoFila *sig;
 };
 
