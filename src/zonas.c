@@ -31,35 +31,58 @@ void Zona eliminar_Zona(struct Zona z){
     z.headAtracciones = NULL;
 };
 
-int agregar_atraccion (struct Zona *z, struct Atraccion *a){
-    if contarAtracciones(z) >= z->atracciones_max {
-        return 0; // No se puede agregar más atracciones
-    }
-        struct NodoAtraccion *nuevo = malloc(sizeof(struct NodoAtraccion));
-        nuevo->datos = a;
-        nuevo->sig = NULL;
 
-        if(z->headAtracciones == NULL) {
-        z->headAtracciones = nuevo;
-    } else {
-        struct NodoAtraccion *actual = z->headAtracciones;
-        while (actual->sig) actual = actual->sig;
-        actual->sig = nuevo;
+struct Zona *buscar_Zona(struct NodoZonas *head, int id) {
+    struct NodoZonas *actual = head;
+    while (actual) {
+        if (actual->datos->id == id)
+            return actual->datos;
+        actual = actual->sig;
     }
-    return 1;
+    return NULL;
+}
+
+void modificar_Zona(struct Zona *z) {
+    int opcion;
+    printf("¿Qué desea modificar?\n");
+    printf("1. Nombre\n2. Temática\n3. Capacidad máxima\n");
+    printf("4. Hora apertura\n5. Hora cierre\n6. Máx. atracciones\n");
+    printf("Opción: "); scanf("%d", &opcion);
+
+    switch (opcion) {
+        case 1: {
+            char nuevo[100];
+            printf("Nuevo nombre: "); scanf(" %99[^\n]", nuevo);
+            free(z->nombre);
+            z->nombre = strdup(nuevo);
+            break;
+        }
+        case 2: {
+            char nuevo[100];
+            printf("Nueva temática: "); scanf(" %99[^\n]", nuevo);
+            free(z->tematica);
+            z->tematica = strdup(nuevo);
+            break;
+        }
+        case 3:
+            printf("Nueva capacidad máxima: ");
+            scanf("%d", &z->cap_max);
+            break;
+        case 4:
+            printf("Nueva hora apertura (HH MM): ");
+            scanf("%d %d", &z->hora_apertura.hora, &z->hora_apertura.minutos);
+            break;
+        case 5:
+            printf("Nueva hora cierre (HH MM): ");
+            scanf("%d %d", &z->hora_cierre.hora, &z->hora_cierre.minutos);
+            break;
+        case 6:
+            printf("Nuevo máx. atracciones: ");
+            scanf("%d", &z->atracciones_max);
+            break;
+        default:
+            printf("Opción inválida.\n");
+    }
+    printf("Zona actualizada.\n");
 };
 
-
-int contarAtracciones(struct Zona *z) {
-    int cont = 0;
-    struct NodoAtraccion *actual = z->headAtracciones;
-    while (actual){
-         cont++; actual = actual->sig; 
-        }
-    return cont;
-    };
-
-
-
-/*struct Atraccion *buscarAtraccion(struct Zona *z, char *nombre) { 
-*/
