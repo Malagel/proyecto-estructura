@@ -1,17 +1,17 @@
 struct Parque{
     int cap_max;
-    struct NodoVisitantes *head_visitante;
+    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado alfabéticamente */
 };
 
 struct NodoVisitantes{
     struct Visitante *v;
-    struct NodoVisitantes *sig;
+    struct NodoVisitantes *izq, *der;
 };
 
 struct Visitante{
-    char *tipo;
     char *nombre;
     char *rut;
+    char *tipo;
     struct Entradas *entrada;
 };
 
