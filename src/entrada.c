@@ -1,57 +1,99 @@
 #include "structs.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void comprar_entrada(struct Parque *parque, int id, char *tipo, int valor, char *fecha){
-    struct NodoEntradas *actual;
-    int i;
-
-    actual = parque->head_entradas;
-    while(actual != NULL){
-        if (actual->entrada->id==id){
-            return;
-        }
-        actual=actual->sig;
-    }
-
-    struct Entrada *nueva_entrada = (struct Entrada*) malloc (sizeof(struct Entrada));
-    struct NodoEntradas *nuevo_nodo = (struct NodoEntradas*)malloc(sizeof(struct NodoEntradas));
-
-    if (nueva_entrada == NULL || nuevo_nodo == NULL){
-        if (nueva_entrada != NULL) free(nueva_entrada);
-        if (nuevo_nodo != NULL) free(nuevo_nodo);
-        return;
-    }
-
-    nueva_entrada->id = id;
-    nueva_entrada->valor=valor;
-    nueva_entrada->tipo=tipo;
-    nueva_entrada->estado="activa";
-
-    
-    for (i=0; i<10 && fecha[i] != '\0'; i++){
-        nueva_entrada->fecha_ingreso[i]=fecha[i];
-    }
-    nueva_entrada->fecha_ingreso[i]='\0';
-
-    nuevo_nodo->entrada=nueva_entrada;
-    nuevo_nodo->sig = parque->head_entradas;
-    parque->head_entradas = nuevo_nodo;
+int estado_valido(char *estado) {
+    if (estado == NULL) return 0;
+    return strcmp(estado, "activa")    == 0 ||
+           strcmp(estado, "utilizada") == 0 ||
+           strcmp(estado, "vencida")   == 0 ||
+           strcmp(estado, "anulada")   == 0;
 }
 
+char *copiar_string(char *origen) {
+    char *destino;
+    if (origen == NULL) return NULL;
+    destino = (char *) malloc(strlen(origen) + 1);
+    if (destino == NULL) return NULL;
+    strcpy(destino, origen);
+    return destino;
+}
 
+int comprar_entrada(struct Parque *parque, char *tipo, int valor, char *fecha) {
+    struct NodoEntradas *actual;
+    struct Entrada      *nueva_entrada;
+    struct NodoEntradas *nuevo_nodo;
+    int i;
+    int nuevo_id = 1;
 
+    if (parque == NULL || tipo == NULL || fecha == NULL) return -1;
+
+    actual = parque->head_entradas;
+    while (actual != NULL) {
+        if (actual->entrada->id >= nuevo_id)
+            nuevo_id = actual->entrada->id + 1;
+        actual = actual->sig;
+    }
+
+    nueva_entrada = (struct Entrada *)     malloc(sizeof(struct Entrada));
+    nuevo_nodo    = (struct NodoEntradas *)malloc(sizeof(struct NodoEntradas));
+
+    if (nueva_entrada == NULL || nuevo_nodo == NULL) {
+        if (nueva_entrada != NULL) free(nueva_entrada);
+        if (nuevo_nodo    != NULL) free(nuevo_nodo);
+        return -1;
+    }
+
+    nueva_entrada->id    = nuevo_id;
+    nueva_entrada->valor = valor;
+
+    nueva_entrada->tipo = copiar_string(tipo);
+    if (nueva_entrada->tipo == NULL) {
+        free(nueva_entrada);
+        free(nuevo_nodo);
+        return -1;
+    }
+
+    nueva_entrada->estado = copiar_string("activa");
+    if (nueva_entrada->estado == NULL) {
+        free(nueva_entrada->tipo);
+        free(nueva_entrada);
+        free(nuevo_nodo);
+        return -1;
+    }
+
+    for (i = 0; i < 10 && fecha[i] != '\0'; i++) {
+        nueva_entrada->fecha_ingreso[i] = fecha[i];
+    }
+    nueva_entrada->fecha_ingreso[i] = '\0';
+
+    nuevo_nodo->entrada   = nueva_entrada;
+    nuevo_nodo->sig       = parque->head_entradas;
+    parque->head_entradas = nuevo_nodo;
+
+    return nuevo_id;
+}
 
 int cambiar_estado_entrada(struct Parque *parque, int id_entrada, char *nuevo_estado) {
-    struct NodoEntradas *actual = parque->head_entradas;
-    
+    struct NodoEntradas *actual;
+    char *copia_estado;
+
+    if (parque == NULL || nuevo_estado == NULL) return -1;
+    if (!estado_valido(nuevo_estado)) return -1;
+
+    actual = parque->head_entradas;
     while (actual != NULL) {
         if (actual->entrada->id == id_entrada) {
-            actual->entrada->estado = nuevo_estado;
+            copia_estado = copiar_string(nuevo_estado);
+            if (copia_estado == NULL) return -1;
+            free(actual->entrada->estado);
+            actual->entrada->estado = copia_estado;
             return 1;
         }
         actual = actual->sig;
     }
-    
-    return 0;
+
+    return -1;
 }
+
