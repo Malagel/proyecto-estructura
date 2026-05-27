@@ -18,6 +18,7 @@ int contar_visitantes_dia(struct NodoVisitantes *visitantes, char *fecha_buscada
     return cont + contar_visitantes_dia(visitantes->izq, fecha_buscada) + contar_visitantes_dia(visitantes->der, fecha_buscada);
 };
 
+/*Funcion para ver cuantas personas estan dentro del parque*/
 int personas_dentro_parque(struct NodoVisitantes *visitantes) {
     if (visitantes == NULL || visitantes->datos == NULL) {
         return 0;
@@ -33,6 +34,7 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes) {
     return cont + personas_dentro_parque(visitantes->izq) + personas_dentro_parque(visitantes->der);
 };
 
+/*Funcion para ver cuanto falta para llegar a la capacidad maxima del parque*/
 int falta_para_cap_max(struct Parque *parque){
     if(parque->raiz_visitantes == NULL){
         return parque->cap_max;
@@ -40,5 +42,6 @@ int falta_para_cap_max(struct Parque *parque){
 
     int personas_dentro = personas_dentro_parque(parque->NodoVisitantes);
 
-    return parque->cap_max - personas_dentro;
+    return parque->cap_max - personas_dentro; 
+    /*Devolvemos la diferencia entre la capacidad maxima y las personas que estan adentro*/
 }
