@@ -1,13 +1,31 @@
 #include <stdio.h>
+#include "utils.h"
 
-void mostrar_menu_principal(void) {
+int escoger_opcion(void) {
+    char linea[100], basura;
+    int asignados, numero;
+
+    while (1) {
+        printf("Escoge una opción: ");
+        if (fgets(linea, sizeof(linea), stdin) != NULL) { 
+            asignados = sscanf(linea, "%d %c", &numero, &basura);
+        }
+
+        if (asignados == 1) 
+            return numero; 
+        
+        printf("[ERROR] Entrada no permitida. Intente de nuevo.\n\n");
+    }
+}
+
+void menu_principal(void) {
     printf(
         "=========================================================================\n"
         "                          ++ SISTEMA IBCLANDIA ++\n"
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                           Para salir escribe '0'\n"
-        "=========================================================================\n"
+        "=========================================================================\n\n"
 
         "- CONTROL Y MANEJO DE PERSONAS\n"
         "[1] Control y Compra de Entradas\n"
@@ -31,24 +49,17 @@ void mostrar_menu_principal(void) {
     );
 }
 
-int escoger_opcion(void) {
-    char linea[100], basura;
-    int asignados, numero;
-
-    mostrar_menu_principal();
-    while (1) {
-        printf("Escoge una opción: ");
-        if (fgets(linea, sizeof(linea), stdin) != NULL) { 
-            asignados = sscanf(linea, "%d %c", &numero, &basura);
-        }
-
-        if (asignados == 1) 
-            return numero; 
-        
-        printf("[ERROR] Entrada no permitida. Intente de nuevo.\n\n");
-    }
-}
 
 void mostrar_submenu_entradas() {
-    printf("")
+    printf(
+        "=========================================================================\n"
+        "                              ++ ENTRADAS ++\n"
+        "=========================================================================\n"
+        "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
+        "                       Para volver atrás escribe '0'\n"
+        "=========================================================================\n\n"
+
+        "[1] Comprar Entrada\n"
+        "[2] Cambiar Estado de Entrada\n\n"
+    );
 }
