@@ -31,7 +31,7 @@ void mostrar_menu_principal(void) {
     );
 }
 
-int opcion_menu_principal(void) {
+int escoger_opcion(void) {
     char linea[100], basura;
     int asignados, numero;
 
@@ -49,7 +49,6 @@ int opcion_menu_principal(void) {
     }
 }
 
-
 void mostrar_submenu_entradas() {
-    
+    printf("")
 }
