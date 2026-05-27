@@ -18,7 +18,7 @@ int escoger_opcion(void) {
     }
 }
 
-void menu_principal(void) {
+void mostrar_menu_principal(void) {
     printf(
         "=========================================================================\n"
         "                          ++ SISTEMA IBCLANDIA ++\n"
