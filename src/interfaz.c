@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void mostrar_menu_principal() {
+void mostrar_menu_principal(void) {
     printf(
         "=========================================================================\n"
         "                          ++ SISTEMA IBCLANDIA ++\n"
@@ -27,6 +27,29 @@ void mostrar_menu_principal() {
         "[9] Ver Zonas Actuales\n\n"
         
         "- BUSCAR INFORMACIÓN\n"
-        "[10] Buscar Visitante\n"
+        "[10] Buscar Visitante\n\n"
     );
+}
+
+int opcion_menu_principal(void) {
+    char linea[100], basura;
+    int asignados, numero;
+
+    mostrar_menu_principal();
+    while (1) {
+        printf("Escoge una opción: ");
+        if (fgets(linea, sizeof(linea), stdin) != NULL) { 
+            asignados = sscanf(linea, "%d %c", &numero, &basura);
+        }
+
+        if (asignados == 1) 
+            return numero; 
+        
+        printf("[ERROR] Entrada no permitida. Intente de nuevo.\n\n");
+    }
+}
+
+
+void mostrar_submenu_entradas() {
+    
 }
