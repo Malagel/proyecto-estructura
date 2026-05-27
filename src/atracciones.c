@@ -1,32 +1,116 @@
-#include <studio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "structs.h"
 
-
-int agregar_atraccion (struct Zona *z, struct Atraccion *a){
-    
-
-    if contar_Atracciones(z) >= z->atracciones_max {
-        return 0; // No se puede agregar más atracciones
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : contarGrupos
+ * Descripción: Cuenta la cantidad de grupos (NodoFila) en una fila.
+ *              Auxiliar usada por listarAtracciones y tiempoEspera.
+ * Retorno    : int -> número de grupos en la fila
+ * ═══════════════════════════════════════════════════════════════════ */
+int contarGrupos(struct Fila *f) {
+    int cont = 0;
+    struct NodoFila *actual = f->frente;
+    while (actual) {
+        cont++;
+        actual = actual->sig;
     }
-        struct NodoAtraccion *nuevo = malloc(sizeof(struct NodoAtraccion));
-        nuevo->datos = a;
-        nuevo->sig = NULL;
+    return cont;
+}
 
-        if(z->headAtracciones == NULL) {
-        z->headAtracciones = nuevo;
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : contar_Atracciones
+ * Descripción: Cuenta cuántas atracciones tiene actualmente una zona.
+ *              Auxiliar usada por agregar_atraccion.
+ * Retorno    : int -> número de atracciones en la lista
+ * ═══════════════════════════════════════════════════════════════════ */
+int contar_Atracciones(struct Zona *z) {
+    int cont = 0;
+    struct NodoAtraccion *actual = z->head_atracciones;
+    while (actual) {
+        cont++;
+        actual = actual->sig;
+    }
+    return cont;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : crearAtraccion
+ * Descripción: Reserva memoria para una nueva atracción, inicializa
+ *              todos sus campos y deja las filas vacías.
+ * Retorno    : struct Atraccion* -> puntero a la nueva atracción,
+ *              NULL si falla el malloc
+ * ═══════════════════════════════════════════════════════════════════ */
+struct Atraccion *crearAtraccion(char *nombre, char *estado, char *tematica,
+                                  int duracion, int edad_min, float altura_min,
+                                  int cap_max, int max_cola_gral,
+                                  int max_cola_prior) {
+    struct Atraccion *a = malloc(sizeof(struct Atraccion));
+    if (!a) { perror("Error al crear atraccion"); return NULL; }
+
+    a->nombre               = strdup(nombre);
+    a->estado               = strdup(estado);
+    a->tematica             = strdup(tematica);
+    a->duracion             = duracion;
+    a->edad_min             = edad_min;
+    a->altura_min           = altura_min;
+    a->cap_max              = cap_max;
+    a->visitantes_totales   = 0;
+    a->max_cola_general     = max_cola_gral;
+    a->max_cola_prioritaria = max_cola_prior;
+
+    /* Inicializar filas vacías */
+    a->cola_general.frente     = NULL;
+    a->cola_general.final      = NULL;
+    a->cola_prioritaria.frente = NULL;
+    a->cola_prioritaria.final  = NULL;
+
+    return a;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : agregar_atraccion
+ * Descripción: Agrega una atracción al final de la lista enlazada
+ *              de una zona, respetando el límite atracciones_max.
+ * Retorno    : 1 si se agregó correctamente, 0 si la zona está llena
+ * ═══════════════════════════════════════════════════════════════════ */
+int agregar_atraccion(struct Zona *z, struct Atraccion *a) {
+
+    /* Verificar que haya espacio en la zona */
+    if (contar_Atracciones(z) >= z->atracciones_max) {
+        printf("Zona '%s' llena (máx %d).\n", z->nombre, z->atracciones_max);
+        return 0;
+    }
+
+    /* Crear nodo contenedor */
+    struct NodoAtraccion *nuevo = malloc(sizeof(struct NodoAtraccion));
+    if (!nuevo) { perror("Error al crear nodo atraccion"); return 0; }
+    nuevo->datos = a;
+    nuevo->sig   = NULL;
+
+    /* Insertar al final de la lista */
+    if (z->head_atracciones == NULL) {
+        /* Lista vacía: el nuevo nodo es la cabeza */
+        z->head_atracciones = nuevo;
     } else {
-        struct NodoAtraccion *actual = z->head_Atracciones;
+        /* Recorrer hasta el último nodo */
+        struct NodoAtraccion *actual = z->head_atracciones;
         while (actual->sig) actual = actual->sig;
         actual->sig = nuevo;
     }
     return 1;
-};
+}
 
-
-/*Funcion para eliminar Atracciones*/
-
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : eliminarAtraccion
+ * Descripción: Busca una atracción por nombre, la desenlaza de la
+ *              lista y libera toda su memoria (filas, nodos, datos).
+ * Retorno    : void
+ * ═══════════════════════════════════════════════════════════════════ */
 void eliminarAtraccion(struct Zona *z, char *nombre) {
 
+    /* Validar entradas */
     if (!z || !nombre) {
         printf("Error: zona o nombre inválido.\n");
         return;
@@ -38,21 +122,19 @@ void eliminarAtraccion(struct Zona *z, char *nombre) {
     }
 
     struct NodoAtraccion *actual = z->head_atracciones;
-    struct NodoAtraccion *previo   = NULL;
+    struct NodoAtraccion *previo = NULL;
 
-    /* Recorrer la lista buscando la atracción por nombre */
+    /* Recorrer la lista buscando por nombre */
     while (actual) {
         if (strcmp(actual->datos->nombre, nombre) == 0) {
 
-            /* ── Desenlazar el nodo de la lista ── */
+            /* Desenlazar: distinguir si es cabeza o nodo intermedio */
             if (previo == NULL)
-
-                /* Era el primer nodo: mover cabeza al siguiente */
                 z->head_atracciones = actual->sig;
             else
-                /* Nodo intermedio o final: saltar el nodo actual */
                 previo->sig = actual->sig;
 
+            /* Liberar nodos de cola general */
             struct NodoFila *nf = actual->datos->cola_general.frente;
             while (nf) {
                 struct NodoFila *temp = nf;
@@ -62,6 +144,7 @@ void eliminarAtraccion(struct Zona *z, char *nombre) {
             actual->datos->cola_general.frente = NULL;
             actual->datos->cola_general.final  = NULL;
 
+            /* Liberar nodos de cola prioritaria */
             nf = actual->datos->cola_prioritaria.frente;
             while (nf) {
                 struct NodoFila *temp = nf;
@@ -71,52 +154,44 @@ void eliminarAtraccion(struct Zona *z, char *nombre) {
             actual->datos->cola_prioritaria.frente = NULL;
             actual->datos->cola_prioritaria.final  = NULL;
 
-            /* ── Liberar campos dinámicos ── */
+            /* Liberar campos dinámicos y struct */
             free(actual->datos->nombre);
             free(actual->datos->estado);
             free(actual->datos->tematica);
-
             free(actual->datos);
             free(actual);
 
             printf("Atracción '%s' eliminada correctamente.\n", nombre);
             return;
         }
-
-        previo   = actual;
+        previo = actual;
         actual = actual->sig;
     }
 
-    printf("Atracción '%s' no encontrada en la zona '%s'.\n",
-           nombre, z->nombre);
+    printf("Atracción '%s' no encontrada en zona '%s'.\n", nombre, z->nombre);
 }
 
-
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : modificarAtraccion
+ * Descripción: Menú interactivo para modificar un campo específico
+ *              de una atracción. Libera memoria anterior en campos
+ *              de tipo char* antes de asignar el nuevo valor.
+ * Retorno    : void
+ * ═══════════════════════════════════════════════════════════════════ */
 void modificarAtraccion(struct Atraccion *a) {
 
-    if (!a) {
-        printf("Error: atracción inválida.\n");
-        return;
-    }
+    if (!a) { printf("Error: atracción inválida.\n"); return; }
 
     int opcion;
     printf("\n¿Qué desea modificar?\n");
-    printf("1. Nombre\n");
-    printf("2. Estado\n");
-    printf("3. Temática\n");
-    printf("4. Duración (min)\n");
-    printf("5. Edad mínima\n");
-    printf("6. Altura mínima\n");
-    printf("7. Capacidad por ciclo\n");
-    printf("8. Máx. grupos cola general\n");
-    printf("9. Máx. grupos cola prioritaria\n");
+    printf("1. Nombre\n2. Estado\n3. Temática\n4. Duración (min)\n");
+    printf("5. Edad mínima\n6. Altura mínima\n7. Capacidad por ciclo\n");
+    printf("8. Máx. grupos cola general\n9. Máx. grupos cola prioritaria\n");
     printf("Opción: ");
     scanf("%d", &opcion);
 
     switch (opcion) {
-
         case 1: {
-            /* Liberar nombre anterior y asignar el nuevo */
             char nuevo[100];
             printf("Nuevo nombre: ");
             scanf(" %99[^\n]", nuevo);
@@ -124,20 +199,15 @@ void modificarAtraccion(struct Atraccion *a) {
             a->nombre = strdup(nuevo);
             break;
         }
-
         case 2: {
-            /* Validar que el estado sea uno de los permitidos */
             char nuevo[30];
-            printf("Estados válidos: operativa / mantenimiento / "
-                   "cerrada / fuera_de_servicio\n");
+            printf("Estados: operativa / mantenimiento / cerrada / fuera_de_servicio\n");
             printf("Nuevo estado: ");
             scanf(" %29[^\n]", nuevo);
-
-            /* Verificar que el estado ingresado sea válido */
-            if (strcmp(nuevo, "operativa")          != 0 &&
-                strcmp(nuevo, "mantenimiento")       != 0 &&
-                strcmp(nuevo, "cerrada")             != 0 &&
-                strcmp(nuevo, "fuera_de_servicio")   != 0) {
+            if (strcmp(nuevo, "operativa")        != 0 &&
+                strcmp(nuevo, "mantenimiento")     != 0 &&
+                strcmp(nuevo, "cerrada")           != 0 &&
+                strcmp(nuevo, "fuera_de_servicio") != 0) {
                 printf("Estado inválido. No se realizaron cambios.\n");
                 return;
             }
@@ -145,9 +215,7 @@ void modificarAtraccion(struct Atraccion *a) {
             a->estado = strdup(nuevo);
             break;
         }
-
         case 3: {
-            /* Liberar temática anterior y asignar la nueva */
             char nuevo[100];
             printf("Nueva temática: ");
             scanf(" %99[^\n]", nuevo);
@@ -155,68 +223,49 @@ void modificarAtraccion(struct Atraccion *a) {
             a->tematica = strdup(nuevo);
             break;
         }
-
         case 4:
-            /* Duración en minutos, debe ser positiva */
             printf("Nueva duración (min): ");
             scanf("%d", &a->duracion);
-            if (a->duracion <= 0) {
-                printf("Duración inválida.\n");
-                a->duracion = 1;
-            }
+            if (a->duracion <= 0) { printf("Inválida, se asigna 1.\n"); a->duracion = 1; }
             break;
-
         case 5:
-            /* Edad mínima, debe ser positiva */
             printf("Nueva edad mínima: ");
             scanf("%d", &a->edad_min);
             break;
-
         case 6:
-            /* Altura mínima en metros */
             printf("Nueva altura mínima (m): ");
             scanf("%f", &a->altura_min);
             break;
-
         case 7:
-            /* Capacidad por ciclo, debe ser mayor a 0 */
             printf("Nueva capacidad por ciclo: ");
             scanf("%d", &a->cap_max);
-            if (a->cap_max <= 0) {
-                printf("Capacidad inválida.\n");
-                a->cap_max = 1;
-            }
+            if (a->cap_max <= 0) { printf("Inválida, se asigna 1.\n"); a->cap_max = 1; }
             break;
-
         case 8:
-            /* Límite de grupos en cola general */
             printf("Nuevo máx. cola general: ");
             scanf("%d", &a->max_cola_general);
             break;
-
         case 9:
-            /* Límite de grupos en cola prioritaria */
             printf("Nuevo máx. cola prioritaria: ");
             scanf("%d", &a->max_cola_prioritaria);
             break;
-
         default:
             printf("Opción inválida.\n");
             return;
     }
-
     printf("Atracción actualizada correctamente.\n");
 }
 
-
-
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : listarAtracciones
+ * Descripción: Imprime los datos de todas las atracciones de una
+ *              zona, incluyendo estado, restricciones y grupos en
+ *              espera en ambas colas.
+ * Retorno    : void
+ * ═══════════════════════════════════════════════════════════════════ */
 void listarAtracciones(struct Zona *z) {
 
-    /* Validar zona */
-    if (!z) {
-        printf("Error: zona inválida.\n");
-        return;
-    }
+    if (!z) { printf("Error: zona inválida.\n"); return; }
 
     if (!z->head_atracciones) {
         printf("La zona '%s' no tiene atracciones registradas.\n", z->nombre);
@@ -232,17 +281,13 @@ void listarAtracciones(struct Zona *z) {
 
     while (actual) {
         struct Atraccion *a = actual->datos;
+        int espera = contarGrupos(&a->cola_general)
+                   + contarGrupos(&a->cola_prioritaria);
 
-        /* Calcular grupos totales en espera */
-        int espera = contarGrupos(&a->cola_general) + contarGrupos(&a->cola_prioritaria);
-
-        printf("[%d] %-22s | Estado : %-20s\n", i++, a->nombre, a->estado);
-        printf("    Temática  : %-20s | Duración : %d min\n",
-               a->tematica, a->duracion);
-        printf("    Edad mín  : %d años       | Altura mín: %.2f m\n",
-               a->edad_min, a->altura_min);
-        printf("    Cap/ciclo : %-5d          | Visitantes: %d\n",
-               a->cap_max, a->visitantes_totales);
+        printf("[%d] %-22s | Estado : %-20s\n",  i++, a->nombre, a->estado);
+        printf("    Temática  : %-20s | Duración : %d min\n",  a->tematica, a->duracion);
+        printf("    Edad mín  : %d años       | Altura mín: %.2f m\n", a->edad_min, a->altura_min);
+        printf("    Cap/ciclo : %-5d          | Visitantes: %d\n", a->cap_max, a->visitantes_totales);
         printf("    En espera : %d grupos (gral: %d | prior: %d)\n",
                espera,
                contarGrupos(&a->cola_general),
@@ -253,22 +298,16 @@ void listarAtracciones(struct Zona *z) {
     }
 }
 
-
-
-int contar_Atracciones(struct Zona *z) {
-    int cont = 0;
-    struct NodoAtraccion *actual = z->head_Atracciones;
-    while (actual){
-         cont++; actual = actual->sig; 
-        }
-    return cont;
-    };
-
-
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : buscar_Atraccion_Por_Nombre
+ * Descripción: Recorre la lista de atracciones de una zona buscando
+ *              coincidencia exacta con el nombre dado.
+ * Retorno    : struct Atraccion* -> atracción encontrada, NULL si no
+ * ═══════════════════════════════════════════════════════════════════ */
 struct Atraccion *buscar_Atraccion_Por_Nombre(struct Zona *z, char *nombre) {
     if (!z || !nombre) return NULL;
 
-    struct NodoAtraccion *actual = z->head_Atracciones;
+    struct NodoAtraccion *actual = z->head_atracciones;
     while (actual) {
         if (strcmp(actual->datos->nombre, nombre) == 0)
             return actual->datos;
@@ -277,10 +316,17 @@ struct Atraccion *buscar_Atraccion_Por_Nombre(struct Zona *z, char *nombre) {
     return NULL;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+ * Función    : buscar_Atraccion_Por_Estado
+ * Descripción: Recorre la lista de atracciones de una zona y retorna
+ *              la primera que coincida con el estado dado.
+ * Retorno    : struct Atraccion* -> primera atracción encontrada,
+ *              NULL si no hay coincidencia
+ * ═══════════════════════════════════════════════════════════════════ */
 struct Atraccion *buscar_Atraccion_Por_Estado(struct Zona *z, char *estado) {
     if (!z || !estado) return NULL;
 
-    struct NodoAtraccion *actual = z->head_Atracciones;
+    struct NodoAtraccion *actual = z->head_atracciones;
     while (actual) {
         if (strcmp(actual->datos->estado, estado) == 0)
             return actual->datos;
