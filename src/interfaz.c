@@ -14,19 +14,19 @@ void mostrar_menu_principal() {
         "[2] Manejo de Visitantes en el Parque\n"
         "[3] Control Filas de Atracciones\n\n" 
 
-        "- GESTIÓN DEL PARQUE"
-        "[3] Gestionar Zonas\n"
-        "[4] Gestionar Atracciones\n\n"
+        "- GESTIÓN DEL PARQUE\n"
+        "[4] Gestionar Zonas\n"
+        "[5] Gestionar Atracciones\n\n"
         
         "- REPORTES Y ESTADÍSTICAS\n"
-        "[5] Ver Reporte General Histórico\n"
-        "[6] Ver Reporte Sobre Atracciones Actual\n\n"
+        "[6] Ver Reporte General Histórico\n"
+        "[7] Ver Reporte Sobre Atracciones Actual\n\n"
 
         "- INFORMACIÓN DEL PARQUE\n"
-        "[7] Ver Atracciones Actuales\n"
-        "[8] Ver Zonas Actuales\n\n"
+        "[8] Ver Atracciones Actuales\n"
+        "[9] Ver Zonas Actuales\n\n"
         
         "- BUSCAR INFORMACIÓN\n"
-        "[9] Buscar Visitante\n"
+        "[10] Buscar Visitante\n"
     );
 }
