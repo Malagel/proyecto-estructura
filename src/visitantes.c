@@ -59,17 +59,15 @@ int agregar_visitante(struct Parque *parque, struct Visitante *nuevo, char *fech
     if(nuevo_n == NULL){
         return 0;
     }
-
     nuevo_n->datos = nuevo;
-    nuevo_n-> = NULL;
-    nuevo_n-> = NULL;
+    nuevo_n->izq = NULL;
+    nuevo_n->der = NULL;
 
     /*Agregamos el visitante en caso de que el arbol este vacio*/
     if(parque->raiz_visitantes == NULL){
         parque->raiz_visitantes = nuevo_n;
         return 1;
     }
-
     actual = parque->raiz_visitantes;
     nodo = NULL;
 
@@ -82,15 +80,14 @@ int agregar_visitante(struct Parque *parque, struct Visitante *nuevo, char *fech
         } else if(comp > 0){
             actual = actual->der; /*Nos movemos a la derecha*/
         }else{
-            return 0; /*No se pudo agregar*/
+            free(nuevo_n)
+            return 0;
         }
     }
-
     if(comp < 0){
         nodo->izq = nuevo_n;
     }else{
         nodo->der = nuevo_n;
     }
-
-    return 1; /*Si se pudo agregar el visitante*/
+    return 1; 
 }
