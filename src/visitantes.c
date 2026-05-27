@@ -19,7 +19,7 @@ int contar_visitantes_dia(struct NodoVisitantes *visitantes, char *fecha_buscada
 };
 
 /*Funcion para ver cuantas personas estan dentro del parque*/
-int personas_dentro_parque(struct NodoVisitantes *visitantes) {
+int personas_dentro_parque(struct NodoVisitantes *visitantes, char *fecha_buscada) {
     if (visitantes == NULL || visitantes->datos == NULL) {
         return 0;
     }
@@ -27,7 +27,9 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes) {
     int cont = 0;
 
     if (strcmp(visitantes->datos->entrada->estado, "utilizada") == 0) {
-        cont++; /*Sumamos ya que la entrada es utilizada*/
+        if(strcmp(visitantes-datos->entrada->fecha_ingreso, fecha_buscada) == 0){
+            cont++; /*Sumamos ya que la entrada es utilizada*/
+        }
     }
 
     /*Ahora la misma suma que en la función anterior*/
