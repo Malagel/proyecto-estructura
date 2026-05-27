@@ -1,35 +1,18 @@
 #include "structs.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int estado_valido(char *estado) {
-    if (estado == NULL) return 0;
-    return strcmp(estado, "activa")    == 0 ||
-           strcmp(estado, "utilizada") == 0 ||
-           strcmp(estado, "vencida")   == 0 ||
-           strcmp(estado, "anulada")   == 0;
-}
-
-char *copiar_string(char *origen) {
-    char *destino;
-    if (origen == NULL) return NULL;
-    destino = (char *) malloc(strlen(origen) + 1);
-    if (destino == NULL) return NULL;
-    strcpy(destino, origen);
-    return destino;
-}
-
-int comprar_entrada(struct Parque *parque, char *tipo, int valor, char *fecha) {
+int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor, char *fecha) {
     struct NodoEntradas *actual;
     struct Entrada      *nueva_entrada;
     struct NodoEntradas *nuevo_nodo;
-    int i;
     int nuevo_id = 1;
 
-    if (parque == NULL || tipo == NULL || fecha == NULL) return -1;
+    if (entradas == NULL || tipo == NULL || fecha == NULL) return -1;
 
-    actual = parque->head_entradas;
+    actual = *entradas;
     while (actual != NULL) {
         if (actual->entrada->id >= nuevo_id)
             nuevo_id = actual->entrada->id + 1;
@@ -63,26 +46,24 @@ int comprar_entrada(struct Parque *parque, char *tipo, int valor, char *fecha) {
         return -1;
     }
 
-    for (i = 0; i < 10 && fecha[i] != '\0'; i++) {
-        nueva_entrada->fecha_ingreso[i] = fecha[i];
-    }
-    nueva_entrada->fecha_ingreso[i] = '\0';
+    strncpy(nueva_entrada->fecha_ingreso, fecha, 10);
+    nueva_entrada->fecha_ingreso[10] = '\0';
 
-    nuevo_nodo->entrada   = nueva_entrada;
-    nuevo_nodo->sig       = parque->head_entradas;
-    parque->head_entradas = nuevo_nodo;
+    nuevo_nodo->entrada = nueva_entrada;
+    nuevo_nodo->sig     = *entradas;
+    *entradas           = nuevo_nodo;
 
     return nuevo_id;
 }
 
-int cambiar_estado_entrada(struct Parque *parque, int id_entrada, char *nuevo_estado) {
+int cambiar_estado_entrada(struct NodoEntradas **entradas, int id_entrada, char *nuevo_estado) {
     struct NodoEntradas *actual;
     char *copia_estado;
 
-    if (parque == NULL || nuevo_estado == NULL) return -1;
+    if (entradas == NULL || nuevo_estado == NULL) return -1;
     if (!estado_valido(nuevo_estado)) return -1;
 
-    actual = parque->head_entradas;
+    actual = *entradas;
     while (actual != NULL) {
         if (actual->entrada->id == id_entrada) {
             copia_estado = copiar_string(nuevo_estado);
@@ -96,4 +77,3 @@ int cambiar_estado_entrada(struct Parque *parque, int id_entrada, char *nuevo_es
 
     return -1;
 }
-
