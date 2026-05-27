@@ -38,3 +38,20 @@ void comprar_entrada(struct Parque *parque, int id, char *tipo, int valor, char 
     nuevo_nodo->sig = parque->head_entradas;
     parque->head_entradas = nuevo_nodo;
 }
+
+
+
+
+int cambiar_estado_entrada(struct Parque *parque, int id_entrada, char *nuevo_estado) {
+    struct NodoEntradas *actual = parque->head_entradas;
+    
+    while (actual != NULL) {
+        if (actual->entrada->id == id_entrada) {
+            actual->entrada->estado = nuevo_estado;
+            return 1;
+        }
+        actual = actual->sig;
+    }
+    
+    return 0;
+}
