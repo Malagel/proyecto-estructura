@@ -32,3 +32,13 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes) {
     /*Ahora la misma suma que en la función anterior*/
     return cont + personas_dentro_parque(visitantes->izq) + personas_dentro_parque(visitantes->der);
 };
+
+int falta_para_cap_max(struct Parque *parque){
+    if(parque->raiz_visitantes == NULL){
+        return parque->cap_max;
+    }
+
+    int personas_dentro = personas_dentro_parque(parque->NodoVisitantes);
+
+    return parque->cap_max - personas_dentro;
+}
