@@ -235,7 +235,7 @@ int atraccion_operativa(struct Atraccion *atraccion) {
     return estado_es_operativo(atraccion->estado);
 }
 
-static int limite_cola_permite(struct Fila *fila, int max_cola, int tam_grupo) {
+ int limite_cola_permite(struct Fila *fila, int max_cola, int tam_grupo) {
     int personas_actuales;
 
     if (max_cola <= 0) {
@@ -364,7 +364,8 @@ int calcular_espera_prioritaria_atraccion(struct Atraccion *atraccion) {
     return ciclos * atraccion->duracion;
 }
 
-static int atender_desde_fila(struct Fila *fila, int *capacidad_restante) {
+
+ int atender_desde_fila(struct Fila *fila, int *capacidad_restante) {
     int atendidos;
     int ids_aux[10];
     int tam_aux;
