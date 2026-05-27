@@ -4,6 +4,6 @@
 #define UTILS_H
 
 void limpiar_pantalla(void);
-void copiar_string(char *destino, const char *origen, size_t tamano_destino);
+char *copiar_string(const char *origen);
 
 #endif
