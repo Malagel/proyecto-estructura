@@ -40,23 +40,56 @@ int falta_para_cap_max(struct Parque *parque, char *fecha_actual){
 
 /*Seccion para agregar visitantes*/
 
-int agregar_visitante(struct Parque *parque, struct Visitante *nuevo, char *fecha_actual){
+struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, int edad_ingresada, float altura_ingresada) {
+    struct Visitante *nuevo_v;
+
+    nuevo_v = (struct Visitante *)malloc(sizeof(struct Visitante));
+
+    if (nuevo_v != NULL) {
+        nuevo_v->nombre = (char *)malloc((strlen(nombre_ingresado) + 1) * sizeof(char));
+        
+        if (nuevo_v->nombre != NULL) {
+            strcpy(nuevo_v->nombre, nombre_ingresado);
+        }
+
+        strncpy(nuevo_v->rut, rut_ingresado, 11);
+        nuevo_v->rut[11] = '\0'; 
+        nuevo_v->edad = edad_ingresada;
+        nuevo_v->altura = altura_ingresada;
+        nuevo_v->entrada = NULL; 
+    }
+
+    return nuevo_v; 
+}
+
+int agregar_visitante(struct Parque *parque, char *fecha_actual, char *nombre, char *rut, int edad, float altura){
     struct NodoVisitantes *nuevo_n;
     struct NodoVisitantes *actual;
     struct NodoVisitantes *nodo;
+    struct Visitante *nuevo;
     int comp;
-    
-    if(parque == NULL || nuevo == NULL){
+
+    if(parque == NULL){
         return 0; /*0 es false*/
     }
 
+    nuevo = crear_visitante(nombre,rut,edad,altura);
+
+    if(nuevo == NULL){
+        return 0;
+    }
+
     if(falta_para_cap_max(parque, fecha_actual) == 0){ 
+        free(nuevo->nombre);
+        free(nuevo);
         return 0;
     }
 
     /*Asignamos la memoria*/
     nuevo_n = (struct NodoVisitantes *)malloc(sizeof(struct NodoVisitantes));
     if(nuevo_n == NULL){
+        free(nuevo->nombre);
+        free(nuevo);
         return 0;
     }
     nuevo_n->datos = nuevo;
@@ -80,7 +113,9 @@ int agregar_visitante(struct Parque *parque, struct Visitante *nuevo, char *fech
         } else if(comp > 0){
             actual = actual->der; /*Nos movemos a la derecha*/
         }else{
-            free(nuevo_n)
+            free(nuevo_n);
+            free(nuevo->nombre);
+            free(nuevo);
             return 0;
         }
     }
