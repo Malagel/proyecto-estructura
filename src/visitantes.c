@@ -3,13 +3,13 @@
 
 /*Funcion para contar los visitantes de todo el dia*/
 int contar_visitantes_dia(struct NodoVisitantes *visitantes, char *fecha_buscada){
-    if(visitantes == NULL || visitantes->v == NULL){
+    if(visitantes == NULL || visitantes->datos == NULL){
         return 0;
     }
 
     int cont = 0;
 
-    if(strcmp(visitantes->v->entrada->fecha_ingreso, fecha_buscada) == 0){
+    if(strcmp(visitantes-datos->entrada->fecha_ingreso, fecha_buscada) == 0){
         cont ++; /*Sumamos ya que si entro el dia que queremos */
     }
 
