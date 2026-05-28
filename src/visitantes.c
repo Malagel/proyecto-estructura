@@ -37,7 +37,6 @@ int falta_para_cap_max(struct Parque *parque){
     }
     int personas_dentro = personas_dentro_parque(parque->raiz_visitantes);
 
-    /*Devolvemos la diferencia entre la capacidad maxima y las personas que estan adentro*/
     return parque->cap_max - personas_dentro; 
 }
 
@@ -72,32 +71,24 @@ struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, i
     return nuevo_v; 
 }
 
-int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, float altura){
+int agregar_visitante(struct NodoVisitantes **raiz_visitantes, char *nombre, char *rut, int edad, float altura) {
     struct NodoVisitantes *nuevo_n;
     struct NodoVisitantes *actual;
     struct NodoVisitantes *nodo;
     struct Visitante *nuevo;
     int comp;
 
-    if(parque == NULL){
-        return 0; /*0 es false*/
+    if (raiz_visitantes == NULL) {
+        return 0; 
     }
 
-    nuevo = crear_visitante(nombre,rut,edad,altura);
-
-    if(nuevo == NULL){
+    nuevo = crear_visitante(nombre, rut, edad, altura);
+    if (nuevo == NULL) {
         return 0;
     }
 
-    if(falta_para_cap_max(parque) == 0){ 
-        free(nuevo->nombre);
-        free(nuevo);
-        return 0;
-    }
-
-    /*Asignamos la memoria*/
     nuevo_n = (struct NodoVisitantes *)malloc(sizeof(struct NodoVisitantes));
-    if(nuevo_n == NULL){
+    if (nuevo_n == NULL) {
         free(nuevo->nombre);
         free(nuevo);
         return 0;
@@ -106,40 +97,42 @@ int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, 
     nuevo_n->izq = NULL;
     nuevo_n->der = NULL;
 
-    /*Agregamos el visitante en caso de que el arbol este vacio*/
-    if(parque->raiz_visitantes == NULL){
-        parque->raiz_visitantes = nuevo_n;
+    if (*raiz_visitantes == NULL) {
+        *raiz_visitantes = nuevo_n;
         return 1;
     }
-    actual = parque->raiz_visitantes;
+
+    actual = *raiz_visitantes;
     nodo = NULL;
 
-    while(actual != NULL){
+    while (actual != NULL) {
         nodo = actual;
         comp = strcmp(nuevo->rut, actual->datos->rut);
 
-        if(comp < 0){
-            actual = actual->izq; /*Nos movemos a la izquierda*/
-        } else if(comp > 0){
-            actual = actual->der; /*Nos movemos a la derecha*/
-        }else{
+        if (comp < 0) {
+            actual = actual->izq;
+        } else if (comp > 0) {
+            actual = actual->der;
+        } else {
             free(nuevo_n);
             free(nuevo->nombre);
             free(nuevo);
             return 0;
         }
     }
-    if(comp < 0){
+
+    if (comp < 0) {
         nodo->izq = nuevo_n;
-    }else{
+    } else {
         nodo->der = nuevo_n;
     }
+    
     return 1; 
 }
 
 /*Seccion para eliminar visitante*/
 
-int eliminar_visitante(struct Parque *parque, char *rut) {
+int eliminar_visitante(struct NodoVisitantes **raiz_visitantes, char *rut) {
     struct NodoVisitantes *actual;
     struct NodoVisitantes *n;
     struct NodoVisitantes *ns;
@@ -147,10 +140,11 @@ int eliminar_visitante(struct Parque *parque, char *rut) {
     struct NodoVisitantes *n_sucesor;
     int comp, vef = 0;
 
-    if (parque == NULL || rut == NULL) {
+    if (raiz_visitantes == NULL || *raiz_visitantes == NULL || rut == NULL) {
         return -1;
     }
-    actual = parque->raiz_visitantes;
+    
+    actual = *raiz_visitantes;
     n = NULL;
 
     while (actual != NULL && vef != 1) {
@@ -160,15 +154,14 @@ int eliminar_visitante(struct Parque *parque, char *rut) {
             vef = 1;
         } else {
             n = actual;
-
             if (comp < 0) {
-            actual = actual->izq;
+                actual = actual->izq;
             } else {
                 actual = actual->der;
             }
         }
-        
     }
+    
     if (actual == NULL) {
         return -1; 
     }
@@ -181,7 +174,7 @@ int eliminar_visitante(struct Parque *parque, char *rut) {
         }
 
         if (n == NULL) {
-            parque->raiz_visitantes = ns;
+            *raiz_visitantes = ns;
         } else if (n->izq == actual) {
             n->izq = ns;
         } else {
@@ -213,5 +206,6 @@ int eliminar_visitante(struct Parque *parque, char *rut) {
         }
         free(sucesor);
     }
+    
     return 1; 
 }
