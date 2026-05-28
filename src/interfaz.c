@@ -454,6 +454,22 @@ void mostrar_submenu_filas() {
     );
 }
 
+void menu_agregar_grupo_fila_prioritaria() {
+
+}
+
+void menu_agregar_grupo_fila_general() {
+
+}
+
+void menu_avanzar_fila_atraccion() {
+
+}
+
+void menu_ver_estado_filas_atraccion() {
+
+}
+
 void mostrar_submenu_zonas() {
     printf(
         "=========================================================================\n"
@@ -473,6 +489,18 @@ void mostrar_submenu_zonas() {
 
 }
 
+void menu_agregar_zona_al_parque() {
+
+}
+
+void menu_agregar_visitante_zona() {
+
+}
+
+void menu_remover_visitante_zona() {
+
+}
+
 void mostrar_submenu_atracciones() {
 
     printf(
@@ -484,10 +512,26 @@ void mostrar_submenu_atracciones() {
         "=========================================================================\n\n"
 
         "[1] Agregar Atracción a Zona\n"
-        "[2] Eliminar Atracción de Zona\n"
+        "[2] Remover Atracción de Zona\n"
         "[3] Mover Atracción a Distinta Zona\n"
         "[4] Modificar Estado de Atracción\n\n" 
 
         "=========================================================================\n\n"
     );
+}
+
+void menu_agregar_atraccion_zona() {
+
+}
+
+void menu_remover_atraccion_zona() {
+
+}
+
+void menu_mover_atraccion_distinta_zona() {
+
+}
+
+void menu_modificar_estado_atraccion() {
+    
 }
