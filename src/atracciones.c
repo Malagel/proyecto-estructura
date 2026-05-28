@@ -8,24 +8,6 @@
 #define ATRACCION_ERROR 0
 
 
- char *copiar_texto(const char *texto) {
-    char *copia;
-    size_t largo;
-
-    if (texto == NULL) {
-        texto = "";
-    }
-
-    largo = strlen(texto) + 1;
-    copia = (char *) malloc(largo * sizeof(char));
-
-    if (copia == NULL) {
-        return NULL;
-    }
-
-    strcpy(copia, texto);
-    return copia;
-}
 
  int estado_atraccion_valido(const char *estado) {
     if (estado == NULL) {
@@ -72,7 +54,7 @@
  * Retorno    : int -> número de grupos en la fila
  * ═══════════════════════════════════════════════════════════════════ */
 
-int contarGrupos(struct Fila *f) {
+int contar_grupos(struct Fila *f) {
     return contar_grupos_fila(f);
 }
 
@@ -83,7 +65,7 @@ int contarGrupos(struct Fila *f) {
  * Retorno    : int -> número de atracciones en la lista
  * ═══════════════════════════════════════════════════════════════════ */
 
-int contar_Atracciones(struct Zona *z) {
+int contar_atracciones(struct Zona *z) {
     int cont;
     struct NodoAtraccion *actual;
 
@@ -110,7 +92,7 @@ int contar_Atracciones(struct Zona *z) {
  *              NULL si falla el malloc
  * ═══════════════════════════════════════════════════════════════════ */
 
-struct Atraccion *crearAtraccion(char *nombre, char *estado, char *tematica,
+struct Atraccion *crear_atraccion(char *nombre, char *estado, char *tematica,
                                   int duracion, int edad_min, float altura_min,
                                   int cap_max, int max_cola_gral,
                                   int max_cola_prior) {
@@ -219,7 +201,7 @@ int agregar_atraccion(struct Zona *z, struct Atraccion *a) {
  * Retorno    : void
  * ═══════════════════════════════════════════════════════════════════ */
 
-void eliminarAtraccion(struct Zona *z, char *nombre) {
+void eliminar_atraccion(struct Zona *z, char *nombre) {
     struct NodoAtraccion *actual;
     struct NodoAtraccion *previo;
 
@@ -286,185 +268,85 @@ int cambiarEstadoAtraccion(struct Atraccion *a, char *nuevo_estado, int vaciar_s
     return ATRACCION_OK;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
- * Función    : modificarAtraccion
- * Descripción: Menú interactivo para modificar un campo específico
- *              de una atracción. Libera memoria anterior en campos
- *              de tipo char* antes de asignar el nuevo valor.
- * Retorno    : void
- * ═══════════════════════════════════════════════════════════════════ */
+int cambiar_estado_atraccion(struct Atraccion *a, const char *nuevo_estado) {
+    if (a == NULL || nuevo_estado == NULL) return 0;
 
-void modificarAtraccion(struct Atraccion *a) {
-    int opcion;
-    char nuevo_texto[100];
-    char nuevo_estado[30];
-    char *copia;
+    const char *estados_validos[] = {
+        "operativa", "mantenimiento", "cerrada", "fuera_de_servicio"
+    };
+    int n = sizeof(estados_validos) / sizeof(estados_validos[0]);
 
-    if (a == NULL) {
-        printf("Error: atraccion invalida.\n");
-        return;
-    }
-
-    printf("\nQue desea modificar?\n");
-    printf("1. Nombre\n2. Estado\n3. Tematica\n4. Duracion (min)\n");
-    printf("5. Edad minima\n6. Altura minima\n7. Capacidad por ciclo\n");
-    printf("8. Max. personas cola general\n9. Max. personas cola prioritaria\n");
-    printf("Opcion: ");
-
-    if (scanf("%d", &opcion) != 1) {
-        printf("Entrada invalida.\n");
-        return;
-    }
-
-    switch (opcion) {
-        case 1:
-            printf("Nuevo nombre: ");
-            scanf(" %99[^\n]", nuevo_texto);
-            copia = copiar_texto(nuevo_texto);
-            if (copia == NULL) {
-                printf("No se pudo actualizar el nombre.\n");
-                return;
-            }
-            free(a->nombre);
-            a->nombre = copia;
-            break;
-
-        case 2:
-            printf("Estados: operativa / mantenimiento / cerrada / fuera_de_servicio\n");
-            printf("Nuevo estado: ");
-            scanf(" %29[^\n]", nuevo_estado);
-            if (!cambiarEstadoAtraccion(a, nuevo_estado, 0)) {
-                return;
-            }
-            break;
-
-        case 3:
-            printf("Nueva tematica: ");
-            scanf(" %99[^\n]", nuevo_texto);
-            copia = copiar_texto(nuevo_texto);
-            if (copia == NULL) {
-                printf("No se pudo actualizar la tematica.\n");
-                return;
-            }
-            free(a->tematica);
-            a->tematica = copia;
-            break;
-
-        case 4:
-            printf("Nueva duracion (min): ");
-            scanf("%d", &a->duracion);
-            if (a->duracion <= 0) {
-                printf("Invalida, se asigna 1.\n");
-                a->duracion = 1;
-            }
-            break;
-
-        case 5:
-            printf("Nueva edad minima: ");
-            scanf("%d", &a->edad_min);
-            break;
-
-        case 6:
-            printf("Nueva altura minima (m): ");
-            scanf("%f", &a->altura_min);
-            break;
-
-        case 7:
-            printf("Nueva capacidad por ciclo: ");
-            scanf("%d", &a->cap_max);
-            if (a->cap_max <= 0) {
-                printf("Invalida, se asigna 1.\n");
-                a->cap_max = 1;
-            }
-            break;
-
-        case 8:
-            printf("Nuevo max. personas cola general: ");
-            scanf("%d", &a->max_cola_general);
-            if (a->max_cola_general < 0) {
-                a->max_cola_general = 0;
-            }
-            break;
-
-        case 9:
-            printf("Nuevo max. personas cola prioritaria: ");
-            scanf("%d", &a->max_cola_prioritaria);
-            if (a->max_cola_prioritaria < 0) {
-                a->max_cola_prioritaria = 0;
-            }
-            break;
-
-        default:
-            printf("Opcion invalida.\n");
-            return;
-    }
-
-    printf("Atraccion actualizada correctamente.\n");
-}
-
-/* ═══════════════════════════════════════════════════════════════════
- * Función    : listarAtracciones
- * Descripción: Imprime los datos de todas las atracciones de una
- *              zona, incluyendo estado, restricciones y grupos en
- *              espera en ambas colas.
- * Retorno    : void
- * ═══════════════════════════════════════════════════════════════════ */
-
-void listarAtracciones(struct Zona *z) {
-    struct NodoAtraccion *actual;
-    struct Atraccion *a;
-    int i;
-    int grupos_general;
-    int grupos_prioridad;
-    int personas_general;
-    int personas_prioridad;
-
-    if (z == NULL) {
-        printf("Error: zona invalida.\n");
-        return;
-    }
-
-    if (z->head_atracciones == NULL) {
-        printf("La zona '%s' no tiene atracciones registradas.\n", z->nombre);
-        return;
-    }
-
-    printf("\n======================================================\n");
-    printf(" Atracciones de la zona: %s\n", z->nombre);
-    printf("======================================================\n");
-
-    actual = z->head_atracciones;
-    i = 1;
-
-    while (actual != NULL) {
-        a = actual->datos;
-
-        if (a != NULL) {
-            grupos_general = contar_grupos_fila(&a->cola_general);
-            grupos_prioridad = contar_grupos_fila(&a->cola_prioritaria);
-            personas_general = contar_personas_fila(&a->cola_general);
-            personas_prioridad = contar_personas_fila(&a->cola_prioritaria);
-
-            printf("[%d] %-22s | Estado : %-20s\n", i, a->nombre, a->estado);
-            printf("    Tematica  : %-20s | Duracion : %d min\n", a->tematica, a->duracion);
-            printf("    Edad min  : %d anios      | Altura min: %.2f m\n", a->edad_min, a->altura_min);
-            printf("    Cap/ciclo : %-5d          | Visitantes atendidos: %d\n", a->cap_max, a->visitantes_totales);
-            printf("    Fila gral : %d grupos / %d personas | Espera aprox: %d min\n",
-                   grupos_general,
-                   personas_general,
-                   calcular_espera_general_atraccion(a));
-            printf("    Fila prior: %d grupos / %d personas | Espera aprox: %d min\n",
-                   grupos_prioridad,
-                   personas_prioridad,
-                   calcular_espera_prioritaria_atraccion(a));
-            printf("------------------------------------------------------\n");
+    for (int i = 0; i < n; i++) {
+        if (strcmp(nuevo_estado, estados_validos[i]) == 0) {
+            char *copia = copiar_texto(nuevo_estado);
+            if (copia == NULL) return 0;
+            free(a->estado);
+            a->estado = copia;
+            return 1;
         }
-
-        i++;
-        actual = actual->sig;
     }
+
+    return 0;
 }
 
+void actualizar_pico_cola_general(struct Atraccion *a, int tam_actual) {
+    if (a == NULL) return;
+    if (tam_actual > a->max_cola_general)
+        a->max_cola_general = tam_actual;
+}
+
+void actualizar_pico_cola_prioritaria(struct Atraccion *a, int tam_actual) {
+    if (a == NULL) return;
+    if (tam_actual > a->max_cola_prioritaria)
+        a->max_cola_prioritaria = tam_actual;
+}
+
+int cambiar_nombre_atraccion(struct Atraccion *a, const char *nuevo_nombre) {
+    if (a == NULL || nuevo_nombre == NULL || nuevo_nombre[0] == '\0') return 0;
+    char *copia = copiar_texto(nuevo_nombre);
+    if (copia == NULL) return 0;
+    free(a->nombre);
+    a->nombre = copia;
+    return 1;
+}
+
+int cambiar_tematica_atraccion(struct Atraccion *a, const char *nueva_tematica) {
+    if (a == NULL || nueva_tematica == NULL || nueva_tematica[0] == '\0') return 0;
+    char *copia = copiar_texto(nueva_tematica);
+    if (copia == NULL) return 0;
+    free(a->tematica);
+    a->tematica = copia;
+    return 1;
+}
+
+int cambiar_duracion_atraccion(struct Atraccion *a, int nueva_duracion) {
+    if (a == NULL || nueva_duracion <= 0) return 0;
+    a->duracion = nueva_duracion;
+    return 1;
+}
+
+int cambiar_edad_minima_atraccion(struct Atraccion *a, int nueva_edad) {
+    if (a == NULL || nueva_edad < 0) return 0;
+    a->edad_min = nueva_edad;
+    return 1;
+}
+
+int cambiar_altura_minima_atraccion(struct Atraccion *a, float nueva_altura) {
+    if (a == NULL || nueva_altura < 0.0f) return 0;
+    a->altura_min = nueva_altura;
+    return 1;
+}
+
+int cambiar_capacidad_atraccion(struct Atraccion *a, int nueva_cap) {
+    if (a == NULL || nueva_cap <= 0) return 0;
+    a->cap_max = nueva_cap;
+    return 1;
+}
+
+struct NodoAtraccion *obtener_atracciones_zona(const struct Zona *z) {
+    if (z == NULL) return NULL;
+    return z->head_atracciones;
+}
 /* ═══════════════════════════════════════════════════════════════════
  * Función    : buscar_Atraccion_Por_Nombre
  * Descripción: Recorre la lista de atracciones de una zona buscando
@@ -491,32 +373,6 @@ struct Atraccion *buscar_Atraccion_Por_Nombre(struct Zona *z, char *nombre) {
     return NULL;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
- * Función    : buscar_Atraccion_Por_Estado
- * Descripción: Recorre la lista de atracciones de una zona y retorna
- *              la primera que coincida con el estado dado.
- * Retorno    : struct Atraccion* -> primera atracción encontrada,
- *              NULL si no hay coincidencia
- * ═══════════════════════════════════════════════════════════════════ */
-
-struct Atraccion *buscar_Atraccion_Por_Estado(struct Zona *z, char *estado) {
-    struct NodoAtraccion *actual;
-
-    if (z == NULL || estado == NULL) {
-        return NULL;
-    }
-
-    actual = z->head_atracciones;
-
-    while (actual != NULL) {
-        if (actual->datos != NULL && strcmp(actual->datos->estado, estado) == 0) {
-            return actual->datos;
-        }
-        actual = actual->sig;
-    }
-
-    return NULL;
-}
 
 
 int agregarGrupoFilaAtraccion(struct Atraccion *a, int ids_grupo[], int tam_grupo, int es_prioritaria) {
