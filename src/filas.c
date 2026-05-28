@@ -240,10 +240,10 @@ int agregar_grupo_atraccion(struct Atraccion *atraccion, int ids_grupo[], int ta
 
     if (es_prioritaria) {
         fila_destino = &atraccion->cola_prioritaria;
-        max_cola = atraccion->max_cola_prioritaria;
+        max_cola = atraccion->pico_cola_prioritaria;
     } else {
         fila_destino = &atraccion->cola_general;
-        max_cola = atraccion->max_cola_general;
+        max_cola = atraccion->pico_cola_general;
     }
 
     if (!limite_cola_permite(fila_destino, max_cola, tam_grupo)) {
