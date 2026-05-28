@@ -45,7 +45,7 @@ struct Fila {
 
 struct Visitante {
     char *nombre;
-    char rut[12];
+    char rut[11];
     int edad;
     float altura;
     struct Entrada *entrada;
