@@ -24,3 +24,21 @@ char *copiar_string(const char *origen) {
 
     return destino; 
 }
+
+char* obtener_fecha_actual(char *buffer) {
+    if (buffer == NULL) {
+        return NULL;
+    }
+
+    time_t tiempo_actual = time(NULL);
+    struct tm *info_tiempo = localtime(&tiempo_actual);
+
+    if (info_tiempo == NULL) {
+        buffer[0] = '\0';
+        return NULL;
+    }
+
+    strftime(buffer, 11, "%d-%m-%Y", info_tiempo);
+
+    return buffer;
+}
