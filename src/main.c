@@ -76,7 +76,7 @@ void ejecutar_submenu_entradas(struct NodoEntradas **entradas) {
                 menu_cambiar_estado_entrada(entradas);
                 break;
             case 0:
-                continuar = 0; /* Al salir del bucle, retorna al main */
+                continuar = 0;
                 break;
             default:
                 printf("\n[AVISO] Opcion invalida en Submenu Entradas.\n");
