@@ -1,30 +1,27 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-struct Parque {
-    int cap_max;
-    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado por rut */
-    struct NodoEntradas *head_entradas; /* Simplemente enlazada */
-    struct NodoZonas *head_zonas; /* Simplemente enlazada */
-};
+/* ========================================================================== */
+/* 1. DECLARACIONES */
+/* ========================================================================== */
 
-struct NodoVisitantes {
-    struct Visitante *datos;
-    struct NodoVisitantes *izq, *der;
-};
+struct Entrada;
+struct Visitante;
+struct Zona;
+struct Atraccion;
+struct NodoVisitantes;
+struct NodoEntradas;
+struct NodoZonas;
+struct NodoAtraccion;
+struct NodoFila;
 
-struct NodoEntradas {
-    struct Entrada *entrada;
-    struct NodoEntradas *sig;
-};
+/* ========================================================================== */
+/* 2. ESTRUCTURAS INDEPENDIENTES Y HOJA */
+/* ========================================================================== */
 
-struct Visitante {
-    char *nombre;
-    char rut[12];
-    int edad;
-    float altura;
-
-    struct Entrada *entrada;
+struct Tiempo {
+    int hora;
+    int minutos;
 };
 
 struct Entrada {
@@ -35,10 +32,28 @@ struct Entrada {
     char fecha_ingreso[11]; /* Formato: DD-MM-YYYY */
 };
 
-struct NodoZonas {
-    struct Zona *datos;
-    struct NodoZonas *sig;
+struct NodoFila {
+    int ids_grupo[10]; /* ids_grupo[0] es el representante del grupo, la id de su entrada */
+    int tam_grupo;
+    struct NodoFila *sig;
 };
+
+struct Fila {
+    struct NodoFila *frente;
+    struct NodoFila *final;
+};
+
+struct Visitante {
+    char *nombre;
+    char rut[12];
+    int edad;
+    float altura;
+    struct Entrada *entrada;
+};
+
+/* ========================================================================== */
+/* 3. ESTRUCTURAS DEPENDIENTES */
+/* ========================================================================== */
 
 struct Zona {
     int id;
@@ -50,19 +65,9 @@ struct Zona {
     
     struct Tiempo hora_apertura;
     struct Tiempo hora_cierre;
-
+    
     int atracciones_max;
     struct NodoAtraccion *head_atracciones;
-};
-
-struct Tiempo {
-    int hora;
-    int minutos;
-};
-
-struct NodoAtraccion {
-    struct Atraccion *datos;
-    struct NodoAtraccion *sig;
 };
 
 struct Atraccion {
@@ -80,19 +85,43 @@ struct Atraccion {
     int cap_max; /* Capacidad por ciclo */
     int visitantes_totales;
 
-    int max_cola_general;
-    int max_cola_prioritaria;
+    int pico_cola_general;      /* máximo histórico de personas en cola general */
+    int pico_cola_prioritaria;  /* máximo histórico de personas en cola prioritaria */
 };
 
-struct NodoFila {
-    int ids_grupo[10]; /* ids_grupo[0] es el representante del grupo, la id de su entrada */
-    int tam_grupo;
-    struct NodoFila *sig;
+/* ========================================================================== */
+/* 4. NODOS */
+/* ========================================================================== */
+
+struct NodoVisitantes {
+    struct Visitante *datos;
+    struct NodoVisitantes *izq, *der;
 };
 
-struct Fila {
-    struct NodoFila *frente;
-    struct NodoFila *final;
+struct NodoEntradas {
+    struct Entrada *entrada;
+    struct NodoEntradas *sig;
+};
+
+struct NodoZonas {
+    struct Zona *datos;
+    struct NodoZonas *sig;
+};
+
+struct NodoAtraccion {
+    struct Atraccion *datos;
+    struct NodoAtraccion *sig;
+};
+
+/* ========================================================================== */
+/* 5. PARQUE */
+/* ========================================================================== */
+
+struct Parque {
+    int cap_max;
+    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado por rut */
+    struct NodoEntradas *head_entradas; /* Simplemente enlazada */
+    struct NodoZonas *head_zonas; /* Simplemente enlazada */
 };
 
 #endif
