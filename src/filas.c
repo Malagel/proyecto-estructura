@@ -195,37 +195,6 @@ void vaciar_fila(struct Fila *fila) {
     }
 }
 
-void mostrar_fila(struct Fila *fila) {
-    struct NodoFila *actual;
-    int posicion;
-    int i;
-
-    if (fila == NULL || fila->frente == NULL) {
-        printf("La fila esta vacia.\n");
-        return;
-    }
-
-    actual = fila->frente;
-    posicion = 1;
-
-    while (actual != NULL) {
-        printf("Grupo %d | Personas: %d | Entradas: ", posicion, actual->tam_grupo);
-
-        for (i = 0; i < actual->tam_grupo; i++) {
-            printf("%d", actual->ids_grupo[i]);
-
-            if (i < actual->tam_grupo - 1) {
-                printf(", ");
-            }
-        }
-
-        printf("\n");
-
-        posicion++;
-        actual = actual->sig;
-    }
-}
-
 
 int atraccion_operativa(struct Atraccion *atraccion) {
     if (atraccion == NULL) {
