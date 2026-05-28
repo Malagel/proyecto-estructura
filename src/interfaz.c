@@ -69,12 +69,20 @@ void mostrar_submenu_entradas() {
 }
 
 void menu_comprar_entrada(entradas) {
+    char linea[150];
+    char tipo_buf[30];
+    int valor_buf;
+    char basura;
+    int asignados;
+    int es_valido;
+    char *fecha_actual;
+
     printf(
         "=========================================================================\n"
         "                           ++ COMPRAR ENTRADA ++\n"
         "=========================================================================\n"
         " Para comprar una entrada y agregarla, rellene los siguientes parámetros \n"
-        "                         En el orden que se indica.\n" 
+        "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
         "=========================================================================\n\n"
 
@@ -86,14 +94,6 @@ void menu_comprar_entrada(entradas) {
 
         "=========================================================================\n\n"
     );
-
-    char linea[150];
-    char tipo_buf[30];
-    int valor_buf;
-    char basura;
-    int asignados;
-    int es_valido;
-    char *fecha_actual;
 
     fecha_actual = obtener_fecha_actual(); 
     es_valido = 0;
@@ -107,6 +107,10 @@ void menu_comprar_entrada(entradas) {
         }
 
         asignados = sscanf(linea, "%29s %d %c", tipo_buf, &valor_buf, &basura);
+
+        if (asignados >= 1 && strcmp(tipo_buf, "volver") == 0) {
+            return;
+        }
 
         if (asignados <= 0) {
             printf("[ERROR] No se detectó ninguna entrada válida. Intente de nuevo.\n\n");
