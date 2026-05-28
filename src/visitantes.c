@@ -46,6 +46,8 @@ int falta_para_cap_max(struct Parque *parque){
 struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, int edad_ingresada, float altura_ingresada) {
     struct Visitante *nuevo_v;
 
+    static int generador_id = 1; 
+
     nuevo_v = (struct Visitante *)malloc(sizeof(struct Visitante));
 
     if (nuevo_v != NULL) {
@@ -57,15 +59,20 @@ struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, i
 
         strncpy(nuevo_v->rut, rut_ingresado, 11);
         nuevo_v->rut[11] = '\0'; 
+        
         nuevo_v->edad = edad_ingresada;
         nuevo_v->altura = altura_ingresada;
+        
+        nuevo_v->id = generador_id; 
+        generador_id++; 
+        
         nuevo_v->entrada = NULL; 
     }
 
     return nuevo_v; 
 }
 
-int agregar_visitante(struct Parque *parque, char *fecha_actual, char *nombre, char *rut, int edad, float altura){
+int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, float altura){
     struct NodoVisitantes *nuevo_n;
     struct NodoVisitantes *actual;
     struct NodoVisitantes *nodo;
@@ -82,7 +89,7 @@ int agregar_visitante(struct Parque *parque, char *fecha_actual, char *nombre, c
         return 0;
     }
 
-    if(falta_para_cap_max(parque, fecha_actual) == 0){ 
+    if(falta_para_cap_max(parque) == 0){ 
         free(nuevo->nombre);
         free(nuevo);
         return 0;
