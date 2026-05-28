@@ -38,14 +38,12 @@ void mostrar_menu_principal(void) {
         "[5] Gestionar Atracciones\n\n"
         
         "- REPORTES Y ESTADÍSTICAS\n"
-        "[6] Ver Reporte General Histórico\n"
+        "[6] Ver Reporte General Del Día\n"
         "[7] Ver Reporte Sobre Atracciones Actual\n\n"
 
         "- INFORMACIÓN DEL PARQUE\n"
         "[8] Ver Atracciones Actuales\n"
-        "[9] Ver Zonas Actuales\n"
-        "[10] Ver Visitantes Totales en el Parque\n\n"
-
+        "[9] Ver Zonas Actuales\n\n"
     
         "=========================================================================\n\n"
     );
@@ -63,7 +61,8 @@ void mostrar_submenu_entradas() {
         "=========================================================================\n\n"
 
         "[1] Comprar Entrada\n"
-        "[2] Cambiar Estado de Entrada\n\n"
+        "[2] Eliminar Entrada del Sistema\n"
+        "[3] Cambiar Estado de Entrada\n\n"
 
         "=========================================================================\n\n"
     );
@@ -98,7 +97,6 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         "=========================================================================\n\n"
     );
 
-    fecha_actual = obtener_fecha_actual(); 
     es_valido = 0;
 
     while (!es_valido) {
@@ -148,7 +146,7 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         es_valido = 1;
     }
 
-    if (comprar_entrada(entradas, tipo_buf, valor_buf, fecha_actual)) {
+    if (comprar_entrada(entradas, tipo_buf, valor_buf)) {
         printf("\n[SISTEMA] Entrada registrada y comprada con éxito\n");
     } else {
         printf("\n[ALERTA] El sistema rechazó la operacion de compra.\n");
@@ -156,6 +154,10 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
 
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
+}
+
+void menu_eliminar_entrada(struct NodoEntradas **entradas) {
+    
 }
 
 void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
@@ -248,6 +250,7 @@ void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
 }
+
 
 void mostrar_submenu_visitantes() {
     printf(
@@ -447,8 +450,7 @@ void mostrar_submenu_filas() {
         
         "[1] Agregar Grupo a la Fila Prioritaria\n"
         "[2] Agregar Grupo a la Fila General\n"
-        "[3] Avanzar Fila de Atracción\n"
-        "[4] Ver Estado de Filas de Atracción\n\n"
+        "[3] Avanzar Fila de Atracción\n\n"
 
         "=========================================================================\n\n"
     );
@@ -466,9 +468,6 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
 
 }
 
-void menu_ver_estado_filas_atraccion(struct NodoZonas *head_zonas) {
-
-}
 
 void mostrar_submenu_zonas() {
     printf(
@@ -480,8 +479,9 @@ void mostrar_submenu_zonas() {
         "=========================================================================\n\n"
 
         "[1] Agregar Zona al Parque\n"
-        "[2] Agregar Visitantes a Zona\n"
-        "[3] Remover VIsitantes de Zona\n\n"
+        "[2] Eliminar Zona Del Parque\n"
+        "[3] Agregar Visitantes a Zona\n"
+        "[4] Remover Visitantes de Zona\n\n"
 
         "=========================================================================\n\n"
 
