@@ -198,8 +198,10 @@ int agregar_atraccion(struct Zona *z, struct Atraccion *a) {
  * Función    : eliminarAtraccion
  * Descripción: Busca una atracción por nombre, la desenlaza de la
  *              lista y libera toda su memoria (filas, nodos, datos).
- * Retorno    : void
+ * Retorno    : void 
  * ═══════════════════════════════════════════════════════════════════ */
+
+ //ACTUALIZA A POR ID NO POR NOMBRE
 
 void eliminar_atraccion(struct Zona *z, char *nombre) {
     struct NodoAtraccion *actual;
