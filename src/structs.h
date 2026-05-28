@@ -71,6 +71,7 @@ struct Zona {
 };
 
 struct Atraccion {
+    int id;
     char *nombre;
     char *estado; /* ["operativa", "mantenimiento", "cerrada", "fuera_de_servicio"] */
     char *tematica;
