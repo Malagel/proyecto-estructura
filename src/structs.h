@@ -29,11 +29,10 @@ struct Entrada {
     char *tipo; /* ["general", "infantil", "familiar", "vip"] */
     int valor;
     char *estado; /* ["activa", "utilizada", "vencida", "anulada"] */
-    char fecha_ingreso[11]; /* Formato: DD-MM-YYYY */
 };
 
 struct NodoFila {
-    int ids_grupo[10]; /* ids_grupo[0] es el representante del grupo, la id de su entrada */
+    int ids_grupo[10]; /* ids_grupo[0] es el representante del grupo, la id del visitante */
     int tam_grupo;
     struct NodoFila *sig;
 };
@@ -44,6 +43,7 @@ struct Fila {
 };
 
 struct Visitante {
+    int id;
     char *nombre;
     char rut[12];
     int edad;
@@ -76,17 +76,16 @@ struct Atraccion {
     char *tematica;
     int duracion; /* En minutos */
     int cap_max; /* Capacidad por ciclo */
-
+    
     int edad_min;
     float altura_min;
-
+    
     struct Fila cola_general;
     struct Fila cola_prioritaria;
-
-    int visitantes_totales;
-
-    int max_cola_general;
-    int max_cola_prioritaria;
+    
+    int visitantes_totales_dia;
+    int max_cola_general_dia;
+    int max_cola_prioritaria_dia;
 };
 
 /* ========================================================================== */

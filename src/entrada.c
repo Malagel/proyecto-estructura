@@ -4,14 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor, char *fecha) {
+int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
     struct NodoEntradas *actual;
     struct Entrada      *nueva_entrada;
     struct NodoEntradas *nuevo_nodo;
     int nuevo_id = 1;
-
-    if (entradas == NULL || tipo == NULL || fecha == NULL) return -1;
-
+    char *fecha;
+    if (entradas == NULL || tipo == NULL) return -1;
+    
     actual = *entradas;
     while (actual != NULL) {
         if (actual->entrada->id >= nuevo_id)
@@ -45,10 +45,7 @@ int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor, char 
         free(nuevo_nodo);
         return -1;
     }
-
-    strncpy(nueva_entrada->fecha_ingreso, fecha, 10);
-    nueva_entrada->fecha_ingreso[10] = '\0';
-
+    
     nuevo_nodo->entrada = nueva_entrada;
     nuevo_nodo->sig     = *entradas;
     *entradas           = nuevo_nodo;
