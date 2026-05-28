@@ -2,6 +2,12 @@
 #include "structs.h"
 #include "interfaz.h"
 
+void ejecutar_submenu_entradas(struct NodoEntradas **entradas);
+void ejecutar_submenu_visitantes(struct Parque *parque);
+void ejecutar_submenu_filas(struct NodoZonas *head_zonas);
+void ejecutar_submenu_zonas(struct NodoZonas *head_zonas);
+void ejecutar_submenu_atracciones(struct NodoZonas *head_zonas);
+
 int main(void) {
     struct Parque *parque = NULL;
     int opcion_principal;
@@ -11,13 +17,16 @@ int main(void) {
 
     parque = (struct Parque *)malloc(sizeof(*parque));
 
+    bienvenida_y_visitantes_parque();
+    parque->cap_max = escoger_opcion();
+
     while (continuar_programa) {
         mostrar_menu_principal();
         opcion_principal = escoger_opcion();
 
         switch (opcion_principal) {
             case 1:
-                ejecutar_submenu_entradas(parque->head_entradas);
+                ejecutar_submenu_entradas(&(parque->head_entradas));
                 break;
             case 2:
                 ejecutar_submenu_visitantes(parque->raiz_visitantes);
@@ -32,7 +41,7 @@ int main(void) {
                 ejecutar_submenu_atracciones(parque->head_zonas);
                 break;
             case 6:
-                funcion_reporte_general_historico();
+                funcion_reporte_general_dia();
                 break;
             case 7:
                 funcion_reporte_atracciones_actual();
@@ -43,14 +52,11 @@ int main(void) {
             case 9:
                 funcion_ver_zonas_actuales();
                 break;
-            case 10:
-                funcion_buscar_visitante();
-                break;
             case 0:
                 continuar_programa = 0;
                 break;
             default:
-                printf("\n[AVISO] Opcion invalida. Ingrese un numero entre 0 y 10.\n");
+                printf("\n[AVISO] Opcion invalida. Ingrese un numero entre 0 y 9.\n");
                 printf("Presione ENTER para continuar...");
                 while (getchar() != '\n');
         }
@@ -73,6 +79,9 @@ void ejecutar_submenu_entradas(struct NodoEntradas **entradas) {
                 menu_comprar_entrada(entradas);
                 break;
             case 2:
+                menu_eliminar_entrada(entradas);
+                break;
+            case 3:
                 menu_cambiar_estado_entrada(entradas);
                 break;
             case 0:
@@ -132,9 +141,6 @@ void ejecutar_submenu_filas(struct NodoZonas *head_zonas) {
             case 3:
                 menu_avanzar_fila_atraccion(head_zonas);
                 break;
-            case 4:
-                menu_ver_estado_filas_atraccion(head_zonas);
-                break;
             case 0:
                 continuar = 0;
                 break;
@@ -160,9 +166,12 @@ void ejecutar_submenu_zonas(struct NodoZonas *head_zonas) {
                 menu_agregar_zona_al_parque(head_zonas);
                 break;
             case 2:
-                menu_agregar_visitante_zona(head_zonas);
+                menu_eliminar_zona_del_parque(head_zonas);
                 break;
             case 3:
+                menu_agregar_visitante_zona(head_zonas);
+                break;
+            case 4:
                 menu_remover_visitante_zona(head_zonas);
                 break;
             case 0:
