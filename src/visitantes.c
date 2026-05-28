@@ -1,5 +1,7 @@
 #include <string.h>
 #include "structs.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 int contar_visitantes_dia(struct NodoVisitantes *visitantes){
     if(visitantes == NULL || visitantes->datos == NULL){
@@ -7,9 +9,7 @@ int contar_visitantes_dia(struct NodoVisitantes *visitantes){
     }
     int cont = 0;
 
-    if (strcmp(visitantes->datos->entrada->estado, "activa") == 0) {
-        cont--; 
-    } else {
+    if (visitantes->datos->entrada != NULL) {
         cont ++;
     }
 
@@ -24,6 +24,10 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes) {
     }
     int cont = 0;
 
+    if(visitantes->datos->entrada == NULL){
+        return 0;
+    }
+
     if (strcmp(visitantes->datos->entrada->estado, "utilizada") == 0) {
         cont++; 
     }
@@ -32,10 +36,11 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes) {
 }
 
 int falta_para_cap_max(struct Parque *parque){
+    int personas_dentro;
     if(parque->raiz_visitantes == NULL){
         return parque->cap_max;
     }
-    int personas_dentro = personas_dentro_parque(parque->raiz_visitantes);
+    personas_dentro = personas_dentro_parque(parque->raiz_visitantes);
 
     return parque->cap_max - personas_dentro; 
 }
@@ -71,19 +76,26 @@ struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, i
     return nuevo_v; 
 }
 
-int agregar_visitante(struct NodoVisitantes **raiz_visitantes, char *nombre, char *rut, int edad, float altura) {
+int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, float altura) {
     struct NodoVisitantes *nuevo_n;
     struct NodoVisitantes *actual;
     struct NodoVisitantes *nodo;
     struct Visitante *nuevo;
     int comp;
 
-    if (raiz_visitantes == NULL) {
+    if (parque == NULL) {
         return 0; 
     }
 
     nuevo = crear_visitante(nombre, rut, edad, altura);
+
     if (nuevo == NULL) {
+        return 0;
+    }
+
+    if (falta_para_cap_max(parque) <= 0) { 
+        free(nuevo->nombre);
+        free(nuevo);
         return 0;
     }
 
@@ -97,12 +109,12 @@ int agregar_visitante(struct NodoVisitantes **raiz_visitantes, char *nombre, cha
     nuevo_n->izq = NULL;
     nuevo_n->der = NULL;
 
-    if (*raiz_visitantes == NULL) {
-        *raiz_visitantes = nuevo_n;
+    if (parque->raiz_visitantes == NULL) {
+        parque->raiz_visitantes = nuevo_n;
         return 1;
     }
 
-    actual = *raiz_visitantes;
+    actual = parque->raiz_visitantes;
     nodo = NULL;
 
     while (actual != NULL) {
@@ -110,9 +122,9 @@ int agregar_visitante(struct NodoVisitantes **raiz_visitantes, char *nombre, cha
         comp = strcmp(nuevo->rut, actual->datos->rut);
 
         if (comp < 0) {
-            actual = actual->izq;
+            actual = actual->izq; /* Nos movemos a la izquierda */
         } else if (comp > 0) {
-            actual = actual->der;
+            actual = actual->der; /* Nos movemos a la derecha */
         } else {
             free(nuevo_n);
             free(nuevo->nombre);
