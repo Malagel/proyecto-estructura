@@ -127,3 +127,82 @@ int agregar_visitante(struct Parque *parque, char *fecha_actual, char *nombre, c
     }
     return 1; 
 }
+
+/*Seccion para eliminar visitante*/
+
+int eliminar_visitante(struct Parque *parque, char *rut) {
+    struct NodoVisitantes *actual;
+    struct NodoVisitantes *n;
+    struct NodoVisitantes *ns;
+    struct NodoVisitantes *sucesor;
+    struct NodoVisitantes *n_sucesor;
+    int comp, vef = 0;
+
+    if (parque == NULL || rut == NULL) {
+        return -1;
+    }
+    actual = parque->raiz_visitantes;
+    n = NULL;
+
+    while (actual != NULL && vef != 1) {
+        comp = strcmp(rut, actual->datos->rut);
+        
+        if (comp == 0) {
+            vef = 1;
+        } else {
+            n = actual;
+
+            if (comp < 0) {
+            actual = actual->izq;
+            } else {
+                actual = actual->der;
+            }
+        }
+        
+    }
+    if (actual == NULL) {
+        return -1; 
+    }
+
+    if (actual->izq == NULL || actual->der == NULL) {
+        if (actual->izq == NULL) {
+            ns = actual->der;
+        } else {
+            ns = actual->izq;
+        }
+
+        if (n == NULL) {
+            parque->raiz_visitantes = ns;
+        } else if (n->izq == actual) {
+            n->izq = ns;
+        } else {
+            n->der = ns;
+        }
+
+        free(actual->datos->nombre);
+        free(actual->datos);
+        free(actual);
+    } 
+    else {
+        n_sucesor = actual;
+        sucesor = actual->der;
+
+        while (sucesor->izq != NULL) {
+            n_sucesor = sucesor;
+            sucesor = sucesor->izq;
+        }
+
+        free(actual->datos->nombre);
+        free(actual->datos);
+
+        actual->datos = sucesor->datos;
+
+        if (n_sucesor == actual) {
+            n_sucesor->der = sucesor->der;
+        } else {
+            n_sucesor->izq = sucesor->der;
+        }
+        free(sucesor);
+    }
+    return 1; 
+}
