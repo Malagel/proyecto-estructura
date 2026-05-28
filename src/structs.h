@@ -26,7 +26,7 @@ struct Tiempo {
 
 struct Entrada {
     int id;
-    char *tipo;
+    char *tipo; /* ["general", "infantil", "familiar", "vip"] */
     int valor;
     char *estado; /* ["activa", "utilizada", "vencida", "anulada"] */
     char fecha_ingreso[11]; /* Formato: DD-MM-YYYY */
@@ -75,6 +75,7 @@ struct Atraccion {
     char *estado; /* ["operativa", "mantenimiento", "cerrada", "fuera_de_servicio"] */
     char *tematica;
     int duracion; /* En minutos */
+    int cap_max; /* Capacidad por ciclo */
 
     int edad_min;
     float altura_min;
@@ -82,7 +83,6 @@ struct Atraccion {
     struct Fila cola_general;
     struct Fila cola_prioritaria;
 
-    int cap_max; /* Capacidad por ciclo */
     int visitantes_totales;
 
     int max_cola_general;
