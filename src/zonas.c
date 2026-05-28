@@ -126,7 +126,7 @@ void modificar_Zona(struct Zona *z) {
 
     if (z == NULL) {
         printf("Zona invalida.\n");
-        return;
+        return -1;
     }
 
     printf("Que desea modificar?\n");
