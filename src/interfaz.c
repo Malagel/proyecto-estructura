@@ -68,7 +68,7 @@ void mostrar_submenu_entradas() {
     );
 }
 
-void menu_comprar_entrada(entradas) {
+void menu_comprar_entrada(struct NodoEntradas **entradas) {
     char linea[150];
     char tipo_buf[30];
     int valor_buf;
