@@ -61,7 +61,6 @@ int cambiar_estado_entrada(struct NodoEntradas **entradas, int id_entrada, char 
     char *copia_estado;
 
     if (entradas == NULL || nuevo_estado == NULL) return -1;
-    if (!estado_valido(nuevo_estado)) return -1;
 
     actual = *entradas;
     while (actual != NULL) {
