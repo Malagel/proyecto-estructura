@@ -7,9 +7,12 @@ int contar_visitantes_dia(struct NodoVisitantes *visitantes){
     }
     int cont = 0;
 
-    if (strcmp(visitantes->datos->entrada->estado, "utilizada") == 0) {
-        cont++; 
+    if (strcmp(visitantes->datos->entrada->estado, "activa") == 0) {
+        cont--; 
+    } else {
+        cont ++;
     }
+
     /*Aqui sumamos lo que se encuentra en el lado izquierdo del arbol y derecho, con el nodo principal. Y return al valor */
     return cont + contar_visitantes_dia(visitantes->izq) + contar_visitantes_dia(visitantes->der);
 }
@@ -25,9 +28,6 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes) {
         cont++; 
     }
 
-    if (strcmp(visitantes->datos->entrada->estado, "vencida") == 0) {
-        cont--; 
-    }
     return cont + personas_dentro_parque(visitantes->izq) + personas_dentro_parque(visitantes->der);
 }
 
