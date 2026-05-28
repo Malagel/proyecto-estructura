@@ -1,4 +1,5 @@
 #include <string.h>
+#include "structs.h"
 
 int contar_visitantes_dia(struct NodoVisitantes *visitantes, char* fecha_actual){
     if(visitantes == NULL || visitantes->datos == NULL){
@@ -21,18 +22,18 @@ int personas_dentro_parque(struct NodoVisitantes *visitantes, char *fecha_actual
     int cont = 0;
 
     if (strcmp(visitantes->datos->entrada->estado, "utilizada") == 0) {
-        if(strcmp(visitantes-datos->entrada->fecha_ingreso, fecha_actual) == 0){
+        if(strcmp(visitantes->datos->entrada->fecha_ingreso, fecha_actual) == 0){
             cont++; /*Sumamos ya que la entrada es utilizada*/
         }
     }
-    return cont + personas_dentro_parque(visitantes->izq) + personas_dentro_parque(visitantes->der);
+    return cont + personas_dentro_parque(visitantes->izq, fecha_actual) + personas_dentro_parque(visitantes->der, fecha_actual);
 }
 
 int falta_para_cap_max(struct Parque *parque, char *fecha_actual){
     if(parque->raiz_visitantes == NULL){
         return parque->cap_max;
     }
-    int personas_dentro = personas_dentro_parque(parque->NodoVisitantes, fecha_actual);
+    int personas_dentro = personas_dentro_parque(parque->raiz_visitantes, fecha_actual);
 
     /*Devolvemos la diferencia entre la capacidad maxima y las personas que estan adentro*/
     return parque->cap_max - personas_dentro; 
