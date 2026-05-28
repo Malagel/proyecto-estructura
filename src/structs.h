@@ -85,8 +85,8 @@ struct Atraccion {
     int cap_max; /* Capacidad por ciclo */
     int visitantes_totales;
 
-    int max_cola_general;
-    int max_cola_prioritaria;
+    int pico_cola_general;      /* máximo histórico de personas en cola general */
+    int pico_cola_prioritaria;  /* máximo histórico de personas en cola prioritaria */
 };
 
 /* ========================================================================== */

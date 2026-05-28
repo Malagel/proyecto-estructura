@@ -3,20 +3,17 @@
 
 #include "structs.h"
 
-struct Zona crear_zona(char *nombre, int id, char *tematica,
-                       struct Tiempo apertura, struct Tiempo cierre,
-                       int cap_max, int atracciones_max);
-struct Zona crear_Zona(char *nombre, int codigo, char *tematica,
-                       struct Tiempo *apertura, struct Tiempo *cierre,
-                       int atracciones_max);
+struct Zona *crear_zona(int id, char *nombre, char *tematica,
+                        struct Tiempo apertura, struct Tiempo cierre,
+                        int cap_max, int atracciones_max);
 void eliminar_zona(struct Zona *z);
-void eliminar_Zona(struct Zona *z);
 
-/* Busqueda, modificacion y listado */
-struct Zona *buscar_Zona(struct NodoZonas *head, int id);
-void modificar_Zona(struct Zona *z);
-void listar_zona(struct Zona *z);
-void listar_zonas(struct NodoZonas *head);
+struct Zona *buscar_zona(struct NodoZonas *head, int id);
+
+int cambiar_nombre_zona(struct Zona *z, const char *nuevo_nombre);
+int cambiar_tematica_zona(struct Zona *z, const char *nueva_tematica);
+int cambiar_cap_max_zona(struct Zona *z, int nueva_cap);
+int cambiar_horario_zona(struct Zona *z, struct Tiempo apertura, struct Tiempo cierre);
+int cambiar_max_atracciones_zona(struct Zona *z, int nuevo_max);
 
 #endif
-

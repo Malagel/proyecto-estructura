@@ -4,29 +4,32 @@
 #include "structs.h"
 
 char *copiar_texto(const char *texto);
-int estado_atraccion_valido(const char *estado);
+int   estado_atraccion_valido(const char *estado);
+int   atraccion_operativa(struct Atraccion *a);
 void liberar_datos_atraccion(struct Atraccion *a);
-int contarGrupos(struct Fila *f);
-int contar_Atracciones(struct Zona *z);
 
-struct Atraccion *crearAtraccion(char *nombre, char *estado, char *tematica,
-                                 int duracion, int edad_min, float altura_min,
-                                 int cap_max, int max_cola_gral,
-                                 int max_cola_prior);
-int agregar_atraccion(struct Zona *z, struct Atraccion *a);
-void eliminarAtraccion(struct Zona *z, char *nombre);
-int cambiarEstadoAtraccion(struct Atraccion *a, char *nuevo_estado, int vaciar_si_no_operativa);
-void modificarAtraccion(struct Atraccion *a);
-void listarAtracciones(struct Zona *z);
-struct Atraccion *buscar_Atraccion_Por_Nombre(struct Zona *z, char *nombre);
-struct Atraccion *buscar_Atraccion_Por_Estado(struct Zona *z, char *estado);
+struct Atraccion *crear_atraccion(char *nombre, char *estado, char *tematica,
+                                  int duracion, int edad_min, float altura_min,
+                                  int cap_max);
+int  agregar_atraccion(struct Zona *z, struct Atraccion *a);
+void eliminar_atraccion(struct Zona *z, char *nombre);
 
-/* Funciones puente hacia filas */
-int agregarGrupoFilaAtraccion(struct Atraccion *a, int ids_grupo[], int tam_grupo, int es_prioritaria);
-int quitarGrupoFilaAtraccion(struct Atraccion *a, int es_prioritaria, int ids_salida[], int *tam_salida);
-int atenderAtraccion(struct Atraccion *a);
-int tiempoEsperaAtraccion(struct Atraccion *a);
-void mostrarFilasAtraccion(struct Atraccion *a);
-void vaciarFilasAtraccion(struct Atraccion *a);
+struct Atraccion    *buscar_atraccion_por_nombre(struct Zona *z, char *nombre);
+struct NodoAtraccion *obtener_atracciones_zona(const struct Zona *z);
+int                   contar_atracciones(struct Zona *z);
+
+int cambiar_estado_atraccion(struct Atraccion *a, const char *nuevo_estado);
+
+
+int cambiar_nombre_atraccion(struct Atraccion *a, const char *nuevo_nombre);
+int cambiar_tematica_atraccion(struct Atraccion *a, const char *nueva_tematica);
+int cambiar_duracion_atraccion(struct Atraccion *a, int nueva_duracion);
+int cambiar_edad_minima_atraccion(struct Atraccion *a, int nueva_edad);
+int cambiar_altura_minima_atraccion(struct Atraccion *a, float nueva_altura);
+int cambiar_capacidad_atraccion(struct Atraccion *a, int nueva_cap);
+
+
+void actualizar_pico_cola_general(struct Atraccion *a, int tam_actual);
+void actualizar_pico_cola_prioritaria(struct Atraccion *a, int tam_actual);
 
 #endif
