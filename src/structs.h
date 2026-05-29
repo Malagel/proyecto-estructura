@@ -84,9 +84,9 @@ struct Atraccion {
     struct Fila cola_general;
     struct Fila cola_prioritaria;
     
-    int visitantes_totales_dia;
-    int max_cola_general_dia;
-    int max_cola_prioritaria_dia;
+    int visitantes_totales;
+    int pico_cola_general;
+    int pico_cola_prioritaria;
 };
 
 /* ========================================================================== */
