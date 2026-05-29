@@ -4,7 +4,7 @@
 
 void ejecutar_submenu_entradas(struct NodoEntradas **entradas);
 void ejecutar_submenu_visitantes(struct Parque *parque);
-void ejecutar_submenu_filas(struct NodoZonas *head_zonas);
+void ejecutar_submenu_filas(struct Parque *parque);
 void ejecutar_submenu_zonas(struct NodoZonas *head_zonas);
 void ejecutar_submenu_atracciones(struct NodoZonas *head_zonas);
 
@@ -32,7 +32,7 @@ int main(void) {
                 ejecutar_submenu_visitantes(parque->raiz_visitantes);
                 break;
             case 3:
-                ejecutar_submenu_filas(parque->head_zonas);
+                ejecutar_submenu_filas(parque);
                 break;
             case 4:
                 ejecutar_submenu_zonas(parque->head_zonas);
@@ -122,7 +122,7 @@ void ejecutar_submenu_visitantes(struct Parque *parque) {
     }
 }
 
-void ejecutar_submenu_filas(struct NodoZonas *head_zonas) {
+void ejecutar_submenu_filas(struct Parque *parque) {
     int sub_opcion;
     int continuar;
     continuar = 1;
@@ -133,13 +133,10 @@ void ejecutar_submenu_filas(struct NodoZonas *head_zonas) {
 
         switch (sub_opcion) {
             case 1:
-                menu_agregar_grupo_fila_prioritaria(head_zonas);
+                menu_agregar_grupo_fila(parque);
                 break;
             case 2:
-                menu_agregar_grupo_fila_general(head_zonas);
-                break;
-            case 3:
-                menu_avanzar_fila_atraccion(head_zonas);
+                menu_avanzar_fila_atraccion(parque->head_zonas);
                 break;
             case 0:
                 continuar = 0;

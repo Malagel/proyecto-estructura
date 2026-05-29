@@ -43,6 +43,28 @@ void liberar_datos_atraccion(struct Atraccion *a) {
     free(a);
 }
 
+struct Atraccion* buscar_atraccion_en_todas_las_zonas(struct NodoZonas *head_zonas, int id) {
+    struct NodoZonas *zona_actual = head_zonas;
+    struct NodoAtraccion *atraccion_actual;
+
+    while (zona_actual != NULL) {
+        atraccion_actual = zona_actual->datos->head_atracciones;
+
+        while (atraccion_actual != NULL) {
+            if (atraccion_actual->datos != NULL) {
+                if (atraccion_actual->datos->id == id) {
+                    return atraccion_actual->datos;
+                }
+            }
+            atraccion_actual = atraccion_actual->sig;
+        }
+
+        zona_actual = zona_actual->sig;
+    }
+
+    return NULL;
+}
+
 struct Atraccion *crear_atraccion(char *nombre, char *estado, char *tematica,
                                   int duracion, int edad_min, float altura_min,
                                   int cap_max) {

@@ -6,7 +6,9 @@
 #define FILA_OK 1
 #define FILA_ERROR 0
 
- struct NodoFila *crear_nodo_fila(int ids_grupo[], int tam_grupo) {
+int limite_cola_permite(struct Fila *fila, int max_cola, int tam_grupo);
+
+struct NodoFila *crear_nodo_fila(int ids_grupo[], int tam_grupo) {
     struct NodoFila *nuevo;
     int i;
 
@@ -33,16 +35,13 @@
     return nuevo;
 }
 
- int estado_es_operativo(char *estado) {
+int estado_es_operativo(char *estado) {
     if (estado == NULL) {
         return FILA_ERROR;
     }
 
     return strcmp(estado, "operativa") == 0;
 }
-
- int limite_cola_permite(struct Fila *fila, int max_cola, int tam_grupo);
-
 
 void inicializar_fila(struct Fila *fila) {
     if (fila == NULL) {
@@ -220,9 +219,91 @@ int atraccion_operativa(struct Atraccion *atraccion) {
     return FILA_OK;
 }
 
-int agregar_grupo_atraccion(struct Atraccion *atraccion, int ids_grupo[], int tam_grupo, int es_prioritaria) {
+int buscar_grupo(struct NodoVisitantes *raiz, int *grupo, int tam_grupo, char *encontrados, int *contador) {
+    if (raiz == NULL) return 0;
+    
+    if (*contador == tam_grupo) return 1;
+
+    if (raiz->datos != NULL) {
+        for (int i = 0; i < tam_grupo; i++) {
+            if (!encontrados[i] && raiz->datos->id == grupo[i]) {
+                encontrados[i] = 1;
+                (*contador)++;
+                if (*contador == tam_grupo) return 1;
+                break; 
+            }
+        }
+    }
+
+    return buscar_grupo(raiz->izq, grupo, tam_grupo, encontrados, contador) ||
+           buscar_grupo(raiz->der, grupo, tam_grupo, encontrados, contador);
+}
+
+int existe_grupo_en_arbol(struct NodoVisitantes *raiz, int *grupo, int tam_grupo) {
+    if (tam_grupo <= 0) return 1;
+    if (raiz == NULL) return 0;
+
+    char encontrados[tam_grupo];
+    memset(encontrados, 0, sizeof(encontrados));
+    
+    int contador = 0;
+
+    buscar_grupo_eficiente(raiz, grupo, tam_grupo, encontrados, &contador);
+
+    return (contador == tam_grupo);
+}
+int verificar_grupo_vip(struct NodoVisitantes *raiz, int *grupo, int tam_grupo, char *encontrados, int *vips_encontrados) {
+    if (*vips_encontrados == tam_grupo) return 1;
+    if (raiz == NULL) return 1; 
+
+    if (raiz->datos != NULL) {
+        for (int i = 0; i < tam_grupo; i++) {
+            if (!encontrados[i] && raiz->datos->id == grupo[i]) {
+                encontrados[i] = 1;
+
+                if (raiz->datos->entrada != NULL && raiz->datos->entrada->tipo != NULL &&
+                    strcmp(raiz->datos->entrada->tipo, "vip") == 0) {
+                    (*vips_encontrados)++;
+                } else {
+                    return 0; 
+                }
+                break;
+            }
+        }
+    }
+
+    if (!verificar_grupo_vip(raiz->izq, grupo, tam_grupo, encontrados, vips_encontrados)) {
+        return 0;
+    }
+
+    return verificar_grupo_vip(raiz->der, grupo, tam_grupo, encontrados, vips_encontrados);
+}
+
+int todos_son_vip(struct NodoVisitantes *raiz, int *grupo, int tam_grupo) {
+    if (tam_grupo <= 0) return 1; 
+    if (raiz == NULL) return 0;
+
+    char encontrados[tam_grupo];
+    memset(encontrados, 0, sizeof(encontrados));
+    
+    int vips_encontrados = 0;
+
+    return verificar_grupo_vip(raiz, grupo, tam_grupo, encontrados, &vips_encontrados);
+}
+
+int agregar_grupo_atraccion(struct NodoVisitantes *visitantes, struct Atraccion *atraccion, int ids_grupo[], int tam_grupo, int es_prioritaria) {
     struct Fila *fila_destino;
     int max_cola;
+
+    if (!existe_grupo_en_arbol(visitantes, ids_grupo, tam_grupo)) {
+        printf("Las IDs no corresponden a visitantes reales del parque.\n");
+        return FILA_ERROR;
+    };
+
+    if (es_prioritaria && !todos_son_vip) {
+        printf("Alguna ID del visitantes no pertenece a la fila prioritaria.\n");
+        return FILA_ERROR;
+    }
 
     if (atraccion == NULL || ids_grupo == NULL || tam_grupo <= 0 || tam_grupo > 10) {
         return FILA_ERROR;
@@ -240,15 +321,12 @@ int agregar_grupo_atraccion(struct Atraccion *atraccion, int ids_grupo[], int ta
 
     if (es_prioritaria) {
         fila_destino = &atraccion->cola_prioritaria;
-        max_cola = atraccion->pico_cola_prioritaria;
+        if (atraccion->pico_cola_prioritaria < atraccion->pico_cola_prioritaria + tam_grupo)
+            atraccion->pico_cola_prioritaria = atraccion->pico_cola_prioritaria + tam_grupo;
     } else {
         fila_destino = &atraccion->cola_general;
-        max_cola = atraccion->pico_cola_general;
-    }
-
-    if (!limite_cola_permite(fila_destino, max_cola, tam_grupo)) {
-        printf("No se puede agregar al grupo: la fila alcanzo su capacidad maxima.\n");
-        return FILA_ERROR;
+        if (atraccion->pico_cola_general < atraccion->pico_cola_general + tam_grupo)
+            atraccion->pico_cola_general = atraccion->pico_cola_general + tam_grupo;
     }
 
     return agregar_grupo_fila(fila_destino, ids_grupo, tam_grupo);
@@ -334,7 +412,7 @@ int calcular_espera_prioritaria_atraccion(struct Atraccion *atraccion) {
 }
 
 
- int atender_desde_fila(struct Fila *fila, int *capacidad_restante) {
+int atender_desde_fila(struct Fila *fila, int *capacidad_restante) {
     int atendidos;
     int ids_aux[10];
     int tam_aux;
