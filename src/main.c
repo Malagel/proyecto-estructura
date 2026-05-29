@@ -41,16 +41,16 @@ int main(void) {
                 ejecutar_submenu_atracciones(parque->head_zonas);
                 break;
             case 6:
-                funcion_reporte_general_dia();
+                funcion_reporte_general_dia(parque);
                 break;
             case 7:
-                funcion_reporte_atracciones_actual();
+                funcion_reporte_atracciones_actual(parque->head_zonas);
                 break;
             case 8:
-                funcion_ver_atracciones_actuales();
+                funcion_ver_atracciones_actuales(parque->head_zonas);
                 break;
             case 9:
-                funcion_ver_zonas_actuales();
+                funcion_ver_zonas_actuales(parque->head_zonas);
                 break;
             case 0:
                 continuar_programa = 0;
