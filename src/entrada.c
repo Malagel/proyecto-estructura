@@ -9,9 +9,9 @@ int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
     struct Entrada      *nueva_entrada;
     struct NodoEntradas *nuevo_nodo;
     int nuevo_id = 1;
-    char *fecha;
+
     if (entradas == NULL || tipo == NULL) return -1;
-    
+
     actual = *entradas;
     while (actual != NULL) {
         if (actual->entrada->id >= nuevo_id)
@@ -45,7 +45,7 @@ int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
         free(nuevo_nodo);
         return -1;
     }
-    
+
     nuevo_nodo->entrada = nueva_entrada;
     nuevo_nodo->sig     = *entradas;
     *entradas           = nuevo_nodo;
@@ -58,7 +58,6 @@ int cambiar_estado_entrada(struct NodoEntradas **entradas, int id_entrada, char 
     char *copia_estado;
 
     if (entradas == NULL || nuevo_estado == NULL) return -1;
-    if (!estado_valido(nuevo_estado)) return -1;
 
     actual = *entradas;
     while (actual != NULL) {
@@ -70,6 +69,35 @@ int cambiar_estado_entrada(struct NodoEntradas **entradas, int id_entrada, char 
             return 1;
         }
         actual = actual->sig;
+    }
+
+    return -1;
+}
+
+int eliminar_entrada(struct NodoEntradas **entradas, int id_entrada) {
+    struct NodoEntradas *actual;
+    struct NodoEntradas *anterior;
+
+    if (entradas == NULL) return -1;
+
+    actual   = *entradas;
+    anterior = NULL;
+
+    while (actual != NULL) {
+        if (actual->entrada->id == id_entrada) {
+            if (anterior == NULL)
+                *entradas = actual->sig;
+            else
+                anterior->sig = actual->sig;
+
+            free(actual->entrada->tipo);
+            free(actual->entrada->estado);
+            free(actual->entrada);
+            free(actual);
+            return 1;
+        }
+        anterior = actual;
+        actual   = actual->sig;
     }
 
     return -1;
