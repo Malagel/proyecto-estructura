@@ -80,7 +80,7 @@ int eliminar_entrada(struct NodoEntradas **entradas, int id_entrada) {
 
     if (entradas == NULL) return -1;
 
-    actual   = *entradas;
+    actual = *entradas;
     anterior = NULL;
 
     while (actual != NULL) {
@@ -97,7 +97,7 @@ int eliminar_entrada(struct NodoEntradas **entradas, int id_entrada) {
             return 1;
         }
         anterior = actual;
-        actual   = actual->sig;
+        actual = actual->sig;
     }
 
     return -1;
