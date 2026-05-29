@@ -6,7 +6,7 @@
 
 int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
     struct NodoEntradas *actual;
-    struct Entrada      *nueva_entrada;
+    struct Entrada *nueva_entrada;
     struct NodoEntradas *nuevo_nodo;
     int nuevo_id = 1;
 
@@ -19,16 +19,16 @@ int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
         actual = actual->sig;
     }
 
-    nueva_entrada = (struct Entrada *)     malloc(sizeof(struct Entrada));
-    nuevo_nodo    = (struct NodoEntradas *)malloc(sizeof(struct NodoEntradas));
+    nueva_entrada = (struct Entrada *)malloc(sizeof(struct Entrada));
+    nuevo_nodo = (struct NodoEntradas *)malloc(sizeof(struct NodoEntradas));
 
     if (nueva_entrada == NULL || nuevo_nodo == NULL) {
         if (nueva_entrada != NULL) free(nueva_entrada);
-        if (nuevo_nodo    != NULL) free(nuevo_nodo);
+        if (nuevo_nodo != NULL) free(nuevo_nodo);
         return -1;
     }
 
-    nueva_entrada->id    = nuevo_id;
+    nueva_entrada->id = nuevo_id;
     nueva_entrada->valor = valor;
 
     nueva_entrada->tipo = copiar_string(tipo);
@@ -47,8 +47,8 @@ int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
     }
 
     nuevo_nodo->entrada = nueva_entrada;
-    nuevo_nodo->sig     = *entradas;
-    *entradas           = nuevo_nodo;
+    nuevo_nodo->sig = *entradas;
+    *entradas = nuevo_nodo;
 
     return nuevo_id;
 }
