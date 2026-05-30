@@ -1,8 +1,9 @@
-#include "structs.h"
-#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "structs.h"
+#include "utils.h"
 
 int calcular_recaudacion_entradas(struct Parque *parque) {
     struct NodoEntradas *actual;

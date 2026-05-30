@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "estadisticas.h"
 #include "structs.h"
 #include "interfaz.h"
 #include "utils.h"
