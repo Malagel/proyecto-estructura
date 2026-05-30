@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+#include "filas.h"
 #include "utils.h"
 #include "visitantes.h"
 
@@ -97,7 +99,7 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: tipo de entrada y valor de la entrada\n"
+        "[1] Los parámetros son: Tipo de Entrada y Valor de la Entrada\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
         "[3] Los tipos de entrada son: 'general', 'infantil', 'familiar', y 'vip'\n"
         "[4] Por ejemplo: 'vip 15000'\n\n"
@@ -142,12 +144,12 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
             strcmp(tipo_buf, "vip") != 0) {
             
             printf("[ERROR] El tipo '%s' no es valido.\n", tipo_buf);
-            printf("[INFO] Tipos permitidos estrictamente en minusculas: [general, infantil, familiar, vip]\n\n");
+            printf("[INFO] Tipos permitidos estrictamente en minúsculas: [general, infantil, familiar, vip]\n\n");
             continue;
         }
 
         if (valor_buf <= 0) {
-            printf("[ERROR] El precio (%d) no es valido. Debe ser un monto mayor a cero.\n\n", valor_buf);
+            printf("[ERROR] El precio (%d) no es válido. Debe ser un monto mayor a cero.\n\n", valor_buf);
             continue;
         }
 
@@ -371,7 +373,7 @@ void menu_agregar_visitante(struct Parque *parque) {
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: nombre, RUT, edad, y altura (metros)\n"
+        "[1] Los parámetros son: Nombre, RUT, Edad, y Altura (metros)\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
         "[3] El nombre no debe contener espacios (ver ejemplo)"
         "[4] Por ejemplo: 'Juan_Perez 15936475-1 45 1.72'\n"
@@ -456,7 +458,7 @@ void menu_eliminar_visitante(struct Parque *parque) {
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] El parámetro es únicamente el RUT del visitante\n"
+        "[1] El parámetro es únicamente el RUT del visitante\n" /* CAMBIAR A ID*/
         "[2] La eliminación es permanente\n"
         "[3] Por ejemplo: '15936475-1'\n\n"
 
@@ -535,24 +537,6 @@ void mostrar_submenu_filas() {
 }
 
 void menu_agregar_grupo_fila(struct Parque *parque) {
-    char linea[256];
-    char token_control[30];
-    char tipo_buf[30];
-    char basura;
-    int ids_grupo[10];
-    
-    char *ptr_linea;
-    int caracteres_leidos;
-    int asignados;
-    int tam_grupo;
-    int id_atraccion;
-    int es_prioritaria;
-    int es_valido;
-    int id_extra;
-    struct Atraccion *atr_encontrada;
-
-    es_valido = 0;
-    tam_grupo = 0;
 
     limpiar_pantalla();
 
@@ -566,7 +550,7 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: IDs del grupo, tipo de fila, ID de atracción\n"
+        "[1] Los parámetros son: IDs del Grupo, Tipo de Fila, ID de Atracción\n"
         "[2] Los ID de los visitantes van separados por un espacio. Máximo 10.\n"
         "[3] Los tipo de fila pueden ser 'general' o 'prioritaria'\n"
         "[4] Por ejemplo: '1 30 9 12 general 14'\n\n"
@@ -574,102 +558,11 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
         "=========================================================================\n\n"
     );
 
-    while (!es_valido) {
-        print(">> ");
 
-        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
-            printf("[ERROR] Error critico al leer desde el teclado.\n\n");
-            continue;
-        }
-
-        if (sscanf(linea, "%29s", token_control) == 1) {
-            if (strcmp(token_control, "volver") == 0) {
-                return;
-            }
-        }
-
-        ptr_linea = linea;
-        tam_grupo = 0;
-
-        while (tam_grupo < 10 && sscanf(ptr_linea, "%d%n", &ids_grupo[tam_grupo], &caracteres_leidos) == 1) {
-            tam_grupo++;
-            ptr_linea += caracteres_leidos;
-        }
-
-        if (tam_grupo == 0) {
-            printf("[ERROR] No se detectó ninguna ID de visitante al inicio. Intente de nuevo.\n\n");
-            continue;
-        }
-
-        if (tam_grupo == 10) {
-            if (sscanf(ptr_linea, "%d", &id_extra) == 1) {
-                printf("[ERROR] Excedió el límite. El grupo puede contener un maximo de 10 visitantes.\n\n");
-                continue;
-            }
-        }
-
-        asignados = sscanf(ptr_linea, "%29s %d %c", tipo_buf, &id_atraccion, &basura);
-
-        if (asignados <= 0) {
-            printf("[ERROR] Falta especificar el tipo de fila (general/prioritaria) y el ID de la atraccion.\n\n");
-            continue;
-        }
-
-        if (asignados == 1) {
-            printf("[ERROR] Falta el último parámetro: Ingrese el ID de la atraccion de destino.\n\n");
-            continue;
-        }
-
-        if (asignados > 2) {
-            printf("[ERROR] Entrada invalida. Detectados elementos desconocidos al final de la linea.\n\n");
-            continue;
-        }
-
-        if (strcmp(tipo_buf, "general") != 0 && strcmp(tipo_buf, "prioritaria") != 0) {
-            printf("[ERROR] Tipo de fila '%s' no valido.\n", tipo_buf);
-            printf("[INFO] Debe escribir exactamente 'general' o 'prioritaria' en minúsculas.\n\n");
-            continue;
-        }
-
-        if (id_atraccion <= 0) {
-            printf("[ERROR] El ID de la atraccion debe ser un numero positivo.\n\n");
-            continue;
-        }
-
-        atr_encontrada = buscar_atraccion(parque->head_zonas, id_atraccion);
-        if (atr_encontrada == NULL) {
-            printf("[ERROR] La atraccion con ID %d no existe en el parque.\n\n", id_atraccion);
-            continue;
-        }
-
-        es_valido = 1;
-    }
-
-    es_prioritaria = (strcmp(tipo_buf, "prioritaria") == 0) ? 1 : 0;
-
-    if (agregar_grupo_atraccion(parque->raiz_visitantes, atr_encontrada, ids_grupo, tam_grupo, es_prioritaria)) {
-        printf("\n[SISTEMA] ¡Grupo de %d visitantes enviado a la fila '%s' con exito!\n", tam_grupo, tipo_buf);
-    } else {
-        printf("\n[ERROR] El sistema denegó la inserción del grupo a la atracción.\n");
-    }
-
-    printf("\nPresione ENTER para regresar al menu principal...");
-    while (getchar() != '\n');
 }
 
 void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
-    char linea[100];
-    char token[30];
-    char basura;
-    int id_atraccion;
-    int asignados;
-    int es_valido;
-    struct Atraccion *atr_encontrada;
-
-    es_valido = 0;
-    id_atraccion = 0;
-    atr_encontrada = NULL;
-
+    
     limpiar_pantalla();
 
     printf(
@@ -689,54 +582,7 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
         "=========================================================================\n\n"
     );
 
-    while (!es_valido) {
-        printf(">> ");
-        
-        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
-            printf("[ERROR] Error critico al leer desde el teclado.\n\n");
-            continue;
-        }
-
-        if (sscanf(linea, "%29s", token) == 1) {
-            if (strcmp(token, "volver") == 0) {
-                return;
-            }
-        }
-
-        asignados = sscanf(linea, "%d %c", &id_atraccion, &basura);
-
-        if (asignados <= 0) {
-            printf("[ERROR] Formato incorrecto. Debe ingresar un ID numerico entero.\n\n");
-            continue;
-        }
-
-        if (asignados > 1) {
-            printf("[ERROR] Entrada invalida. Escribio argumentos de mas al final de la linea.\n\n");
-            continue;
-        }
-
-        if (id_atraccion <= 0) {
-            printf("[ERROR] ID invalido. El identificador debe ser un numero entero positivo.\n\n");
-            continue;
-        }
-
-        atr_encontrada = buscar_atraccion_en_zonas(head_zonas, id_atraccion);
-        if (atr_encontrada == NULL) {
-            printf("[ERROR] La atraccion con ID %d no existe en el sistema del parque.\n\n", id_atraccion);
-            continue;
-        }
-
-        es_valido = 1;
-    }
-
-    if (atender_ciclo_atraccion(atr_encontrada)) {
-        printf("\n[SISTEMA] Ciclo ejecutado con éxito. La fila de espera ha avanzado.\n");
-    } else {
-        printf("\n[ERROR] No se pudo avanzar la fila.\n");
-    }
-
-    printf("Presione ENTER para continuar...");
-    while (getchar() != '\n');
+   
 }
 
 void mostrar_submenu_zonas() {
@@ -776,6 +622,8 @@ void menu_remover_visitante_zona(struct NodoZonas *head_zonas) {
 
 }
 
+
+
 void mostrar_submenu_atracciones() {
     limpiar_pantalla();
 
@@ -788,7 +636,7 @@ void mostrar_submenu_atracciones() {
         "=========================================================================\n\n"
 
         "[1] Agregar Atracción a Zona\n"
-        "[2] Remover Atracción de Zona\n"
+        "[2] Eliminar Atracción de Zona\n"
         "[3] Mover Atracción a Distinta Zona\n"
         "[4] Modificar Estado de Atracción\n\n" 
 
@@ -797,21 +645,424 @@ void mostrar_submenu_atracciones() {
 }
 
 void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas) {
+    char linea[256];
+    char token_control[40];
+    char nombre_buf[40];
+    char tematica_buf[30];
+    char basura;
+    
+    int id_zona_buf;
+    int duracion_buf;
+    int cap_max_buf;
+    int edad_min_buf;
+    float altura_min_buf;
+    
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+    struct Zona *zona_destino;
+
+    es_valido = 0;
+    zona_destino = NULL;
+
     limpiar_pantalla();
 
+    printf(
+        "=========================================================================\n"
+        "                     ++ AGREGAR ATRACCIÓN A ZONA ++\n"
+        "=========================================================================\n"
+        "       Para agregar una atracción, rellene los siguientes parámetros \n"
+        "                         en el orden que se indica.\n" 
+        "                 Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
+
+        "- INFORMACIÓN\n"
+        "[1] Los parámetros son: ID Zona, Nombre_Sin_Espacios, Temática,\n"
+        "Duración, Personas por Ciclo, Edad_Min, y Altura Mínima (metros)]\n"
+        "[2] Por ejemplo: '3 Trueno_del_Dragon Aventura 4 24 10 1.20'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer desde el teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%39s", token_control) == 1) {
+            if (strcmp(token_control, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%d %39s %29s %d %d %d %f %c",
+                           &id_zona_buf, nombre_buf, tematica_buf, &duracion_buf,
+                           &cap_max_buf, &edad_min_buf, &altura_min_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] No se detectó ningun ingreso válido. Intente de nuevo.\n\n");
+            continue;
+        }
+
+        if (asignados < 7) {
+            printf("[ERROR] Datos incompletos. Se procesaron solo %d de los 7 campos requeridos.\n\n", asignados);
+            continue;
+        }
+
+        if (asignados > 7) {
+            printf("[ERROR] Entrada inválida. Detectados elementos desconocidos al final de la línea.\n\n");
+            continue;
+        }
+
+        if (id_zona_buf <= 0 || duracion_buf <= 0 || cap_max_buf <= 0 || edad_min_buf < 0 || altura_min_buf < 0.0f) {
+            printf("[ERROR] Valores numericos incoherentes. Verifique que las cantidades sean positivas.\n\n");
+            continue;
+        }
+
+        zona_destino = obtener_zona_por_id(head_zonas, id_zona_buf);
+        if (zona_destino == NULL) {
+            printf("[ERROR] La zona con ID %d no existe en el sistema del parque.\n\n", id_zona_buf);
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = agregar_atraccion(head_zonas, zona_destino, nombre_buf, tematica_buf, 
+                                         duracion_buf, cap_max_buf, edad_min_buf, altura_min_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] ¡Atraccion '%s' agregada con exito a la zona ID %d!\n", nombre_buf, id_zona_buf);
+            break;
+            
+        case -2:
+            printf("\n[ERROR] Incompatibilidad: La tematica '%s' no coincide con la identidad de la zona.\n", tematica_buf);
+            break;
+            
+        case -3:
+            printf("\n[ERROR] Capacidad excedida: La zona ID %d no tiene espacio fisico para mas atracciones.\n", id_zona_buf);
+            break;
+            
+        default:
+            printf("\n[ERROR] Operacion rechazada. Codigo de error no especificado (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("\nPresione ENTER para regresar al menú principal...");
+    while (getchar() != '\n');
 }
 
-void menu_remover_atraccion_zona(struct NodoZonas *head_zonas) {
+void menu_eliminar_atraccion_zona(struct NodoZonas *head_zonas) {
+    char linea[100];
+    char token[30];
+    char basura;
+    int id_atraccion_buf;
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+
+    es_valido = 0;
+    id_atraccion_buf = 0;
+
     limpiar_pantalla();
 
+    printf(
+        "=========================================================================\n"
+        "                    ++ ELIMINAR ATRACCIÓN DE ZONA ++\n"
+        "=========================================================================\n"
+        "     Para eliminar una atracción, rellene los siguientes parámetros \n"
+        "                         en el orden que se indica.\n" 
+        "                Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
+
+        "- INFORMACIÓN\n"
+        "[1] El único parámetro es la ID de la atracción.\n"
+        "[2] Por ejemplo: '3'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+        
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer desde el teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "volver") == 0) {
+                return; 
+            }
+        }
+
+        asignados = sscanf(linea, "%d %c", &id_atraccion_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] Formato incorrecto. Debe ingresar un ID numérico entero.\n\n");
+            continue;
+        }
+
+        if (asignados > 1) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (id_atraccion_buf <= 0) {
+            printf("[ERROR] ID inválido. El identificador debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = eliminar_atraccion(head_zonas, id_atraccion_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] Atracción con ID %d eliminada exitosamente del parque.\n", id_atraccion_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Error de sistema: La estructura de Zonas es nula.\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] No se pudo eliminar: No se encontró ninguna atracción con el ID %d.\n", id_atraccion_buf);
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menu principal...");
+    while (getchar() != '\n');
 }
 
 void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas) {
+    char linea[150];
+    char token[30];
+    char basura;
+    int id_objetivo_buf;
+    int id_atraccion_buf;
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+    struct Zona *zona_objetivo;
+
+    es_valido = 0;
+    id_objetivo_buf = 0;
+    id_atraccion_buf = 0;
+    zona_objetivo = NULL;
+
     limpiar_pantalla();
+
+    printf(
+        "=========================================================================\n"
+        "                      ++ MOVER ATRACCION A ZONA ++\n"
+        "=========================================================================\n"
+        "       Para mover una atracción, rellene los siguientes parámetros \n"
+        "                        en el orden que se indica.\n" 
+        "                 Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
+
+        "- INFORMACIÓN\n"
+        "[1] Los parámetros son: ID Zona objetivo, ID Atracción.\n"
+        "[2] Deben estar separados por espacios.\n"
+        "[2] Por ejemplo: '3 23'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer desde el teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%d %d %c", &id_objetivo_buf, &id_atraccion_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] No se detectó ningún ingreso válido. Intente de nuevo.\n\n");
+            continue;
+        }
+
+        if (asignados < 2) {
+            printf("[ERROR] Datos incompletos. Debe ingresar la ID de la zona objetivo y la ID de la atracción.\n\n");
+            continue;
+        }
+
+        if (asignados > 2) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (id_objetivo_buf <= 0 || id_atraccion_buf <= 0) {
+            printf("[ERROR] IDs inválidas. Los identificadores deben ser números enteros positivos.\n\n");
+            continue;
+        }
+
+        zona_objetivo = obtener_zona_por_id(head_zonas, id_objetivo_buf);
+        if (zona_objetivo == NULL) {
+            printf("[ERROR] La zona objetivo con ID %d no existe en el sistema del parque.\n\n", id_objetivo_buf);
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = mover_atraccion(head_zonas, zona_objetivo, id_atraccion_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] ¡Atracción con ID %d movida con éxito a la zona objetivo %d!\n", 
+                   id_atraccion_buf, id_objetivo_buf);
+            break;
+            
+        case -2:
+            printf("\n[ERROR] Incompatibilidad: La temática de la atracción no coincide con la identidad de la zona objetivo.\n");
+            break;
+            
+        case -3:
+            printf("\n[ERROR] Capacidad excedida: La zona objetivo con ID %d llegó al máximo de su capacidad.\n", id_objetivo_buf);
+            break;
+            
+        case -4:
+            printf("\n[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d en ninguna zona del parque.\n", id_atraccion_buf);
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menu principal...");
+    while (getchar() != '\n');
 
 }
 
 void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas) {
+    char linea[150];
+    char token[30];
+    char estado_buf[30];
+    char basura;
+    int id_atraccion_buf;
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+
+    es_valido = 0;
+    id_atraccion_buf = 0;
+
     limpiar_pantalla();
+
+    printf(
+        "=========================================================================\n"
+        "                   ++ MODIFICAR ESTADO DE ATRACCION ++\n"
+        "=========================================================================\n"
+        "     Para modificar una atracción, rellene los siguientes parámetros \n"
+        "                        en el orden que se indica.\n" 
+        "                 Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
+
+        "- INFORMACIÓN\n"
+        "[1] Los parámetros son: ID de Atracción, y nuevo estado.\n"
+        "[2] Los estados posibles son: 'operativa', 'mantenimiento', 'cerrada' y,\n" 
+        "'fuera_de_servicio'.\n"
+        "[3] Todo debe estar en minúsculas y sin espacios.\n"
+        "[4] Por ejemplo: '42 mantenimiento'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer desde el teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%d %29s %c", &id_atraccion_buf, estado_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] Formato incorrecto. El primer parámetro debe ser el ID numérico de la atracción.\n\n");
+            continue;
+        }
+
+        if (asignados == 1) {
+            printf("[ERROR] Datos incompletos. Debe ingresar el nuevo estado después del ID.\n\n");
+            continue;
+        }
+
+        if (asignados > 2) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (id_atraccion_buf <= 0) {
+            printf("[ERROR] ID inválido. El identificador debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        if (strcmp(estado_buf, "operativa") != 0 && 
+            strcmp(estado_buf, "mantenimiento") != 0 && 
+            strcmp(estado_buf, "cerrada") != 0 && 
+            strcmp(estado_buf, "fuera_de_servicio") != 0) {
+            
+            printf("[ERROR] El estado '%s' no es válido.\n", estado_buf);
+            printf("[INFO] Estados permitidos: [operativa, mantenimiento, cerrada, fuera_de_servicio]\n\n");
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = cambiar_estado_atraccion(head_zonas, id_atraccion_buf, estado_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] Estado de la atracción %d actualizado a '%s' con éxito\n", 
+                   id_atraccion_buf, estado_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Error de sistema: La estructura de Zonas es nula (NULL).\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d en el parque.\n", id_atraccion_buf);
+            break;
+            
+        case -3:
+            printf("\n[ERROR] Error crítico: Falta memoria en el sistema para procesar el cambio.\n");
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menu principal...");
+    while (getchar() != '\n');
 
 }

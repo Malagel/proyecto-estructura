@@ -196,7 +196,7 @@ void ejecutar_submenu_atracciones(struct NodoZonas *head_zonas) {
                 menu_agregar_atraccion_zona(head_zonas);
                 break;
             case 2:
-                menu_remover_atraccion_zona(head_zonas);
+                menu_eliminar_atraccion_zona(head_zonas);
                 break;
             case 3:
                 menu_mover_atraccion_distinta_zona(head_zonas);

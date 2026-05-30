@@ -1,7 +1,8 @@
 #include <string.h>
-#include "structs.h"
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "structs.h"
 
 int contar_visitantes_dia(struct NodoVisitantes *visitantes){
     if(visitantes == NULL || visitantes->datos == NULL){
@@ -13,11 +14,9 @@ int contar_visitantes_dia(struct NodoVisitantes *visitantes){
         cont ++;
     }
 
-    /*Aqui sumamos lo que se encuentra en el lado izquierdo del arbol y derecho, con el nodo principal. Y return al valor */
     return cont + contar_visitantes_dia(visitantes->izq) + contar_visitantes_dia(visitantes->der);
 }
 
-/*Funcion para ver cuantas personas estan dentro del parque*/
 int personas_dentro_parque(struct NodoVisitantes *visitantes) {
     if (visitantes == NULL || visitantes->datos == NULL) {
         return 0;
@@ -44,8 +43,6 @@ int falta_para_cap_max(struct Parque *parque){
 
     return parque->cap_max - personas_dentro; 
 }
-
-/*Seccion para agregar visitantes*/
 
 struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, int edad_ingresada, float altura_ingresada) {
     struct Visitante *nuevo_v;
@@ -119,12 +116,12 @@ int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, 
 
     while (actual != NULL) {
         nodo = actual;
-        comp = strcmp(nuevo->rut, actual->datos->rut);
+        comp = nuevo->id - actual->datos->id;
 
         if (comp < 0) {
-            actual = actual->izq; /* Nos movemos a la izquierda */
+            actual = actual->izq; 
         } else if (comp > 0) {
-            actual = actual->der; /* Nos movemos a la derecha */
+            actual = actual->der; 
         } else {
             free(nuevo_n);
             free(nuevo->nombre);
@@ -141,8 +138,6 @@ int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, 
     
     return 1; 
 }
-
-/*Seccion para eliminar visitante*/
 
 int eliminar_visitante(struct NodoVisitantes **raiz_visitantes, char *rut) {
     struct NodoVisitantes *actual;

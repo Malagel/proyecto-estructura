@@ -4,297 +4,282 @@
 #include "structs.h"
 #include "filas.h"
 
-#define ATRACCION_OK    -1
-#define ATRACCION_ERROR 0
+int agregar_atraccion(struct NodoZonas *head_zonas, struct Zona *zona, const char *nombre, 
+                      const char *tematica, int duracion, int cap_max, int edad_min, float altura_min) {
+    
+    int contador_atracciones;
+    int nueva_id;
+    int id_ocupada;
+    struct NodoZonas *zona_aux;
+    struct NodoAtraccion *actual;
+    struct NodoAtraccion *nuevo_nodo;
+    struct Atraccion *nueva_atraccion;
 
-
-int estado_atraccion_valido(const char *estado) {
-    if (estado == NULL) {
-        return ATRACCION_ERROR;
+    if (head_zonas == NULL || zona == NULL) {
+        return -1; /* PUNTERO NULO */
     }
 
-    if (strcmp(estado, "operativa")         == 0) return ATRACCION_OK;
-    if (strcmp(estado, "mantenimiento")     == 0) return ATRACCION_OK;
-    if (strcmp(estado, "cerrada")           == 0) return ATRACCION_OK;
-    if (strcmp(estado, "fuera_de_servicio") == 0) return ATRACCION_OK;
-
-    return ATRACCION_ERROR;
-}
-
-int atraccion_operativa(struct Atraccion *a) {
-    if (a == NULL) {
-        return ATRACCION_ERROR;
+    if (zona->tematica == NULL || tematica == NULL || strcmp(zona->tematica, tematica) != 0) {
+        return -2; /* TEMATICA INCOMPATIBLE */
     }
 
-    return strcmp(a->estado, "operativa") == 0;
-}
-
-void liberar_datos_atraccion(struct Atraccion *a) {
-    if (a == NULL) {
-        return;
+    contador_atracciones = 0;
+    actual = zona->head_atracciones;
+    while (actual != NULL) {
+        contador_atracciones++;
+        actual = actual->sig;
     }
 
-    vaciar_fila(&a->cola_general);
-    vaciar_fila(&a->cola_prioritaria);
+    if (contador_atracciones >= zona->atracciones_max) {
+        return -3; /*SIN ESPACIO*/
+    }
 
-    free(a->nombre);
-    free(a->estado);
-    free(a->tematica);
-    free(a);
-}
+    nueva_id = 1;
+    id_ocupada = 1;
 
-struct Atraccion* buscar_atraccion_en_todas_las_zonas(struct NodoZonas *head_zonas, int id) {
-    struct NodoZonas *zona_actual = head_zonas;
-    struct NodoAtraccion *atraccion_actual;
+    while (id_ocupada) {
+        id_ocupada = 0;
+        zona_aux = head_zonas;
 
-    while (zona_actual != NULL) {
-        atraccion_actual = zona_actual->datos->head_atracciones;
-
-        while (atraccion_actual != NULL) {
-            if (atraccion_actual->datos != NULL) {
-                if (atraccion_actual->datos->id == id) {
-                    return atraccion_actual->datos;
+        while (zona_aux != NULL) {
+            if (zona_aux->datos != NULL) {
+                actual = zona_aux->datos->head_atracciones;
+                
+                while (actual != NULL) {
+                    if (actual->datos != NULL && actual->datos->id == nueva_id) {
+                        id_ocupada = 1;
+                        break;
+                    }
+                    actual = actual->sig;
                 }
             }
-            atraccion_actual = atraccion_actual->sig;
+            
+            if (id_ocupada) {
+                break; 
+            }
+            zona_aux = zona_aux->sig;
         }
 
+        if (id_ocupada) {
+            nueva_id++;
+        }
+    }
+
+    nuevo_nodo = (struct NodoAtraccion *)malloc(sizeof(struct NodoAtraccion));
+    nueva_atraccion = (struct Atraccion *)malloc(sizeof(struct Atraccion));
+
+    if (nuevo_nodo == NULL || nueva_atraccion == NULL) {
+        free(nuevo_nodo);
+        free(nueva_atraccion);
+        return -4; /* ERROR MEMORIA */
+    }
+
+    nueva_atraccion->nombre = copiar_string(nombre);
+    nueva_atraccion->tematica = copiar_string(tematica);
+    nueva_atraccion->estado = copiar_string("operativa");
+
+    if (nueva_atraccion->nombre == NULL || nueva_atraccion->tematica == NULL || nueva_atraccion->estado == NULL) {
+        free(nueva_atraccion->nombre);
+        free(nueva_atraccion->tematica);
+        free(nueva_atraccion->estado);
+        free(nueva_atraccion);
+        free(nuevo_nodo);
+        return -4; /* ERROR MEMORIA */
+    }
+
+    nueva_atraccion->id = nueva_id;
+    nueva_atraccion->duracion = duracion;
+    nueva_atraccion->cap_max = cap_max;
+    nueva_atraccion->edad_min = edad_min;
+    nueva_atraccion->altura_min = altura_min;
+
+    nueva_atraccion->cola_general.frente = NULL;
+    nueva_atraccion->cola_general.final = NULL;
+    nueva_atraccion->cola_prioritaria.frente = NULL;
+    nueva_atraccion->cola_prioritaria.final = NULL;
+
+    nueva_atraccion->visitantes_totales = 0;
+    nueva_atraccion->pico_cola_general = 0;
+    nueva_atraccion->pico_cola_prioritaria = 0;
+
+    nuevo_nodo->datos = nueva_atraccion;
+    nuevo_nodo->sig = zona->head_atracciones;
+    zona->head_atracciones = nuevo_nodo;
+
+    return 0; /* EXITO */
+}
+
+int eliminar_atraccion(struct NodoZonas *head_zonas, int id_atraccion) {
+    struct NodoZonas *zona_actual;
+    struct NodoAtraccion **enlace;
+    struct NodoAtraccion *a_eliminar;
+    struct NodoFila *aux_fila;
+    struct NodoFila *sig_fila;
+
+    if (head_zonas == NULL) {
+        return -1; /* ZONA NULA */
+    }
+
+    zona_actual = head_zonas;
+
+    while (zona_actual != NULL) {
+        if (zona_actual->datos != NULL) {
+            
+            enlace = &zona_actual->datos->head_atracciones;
+
+            while (*enlace != NULL) {
+                if ((*enlace)->datos != NULL && (*enlace)->datos->id == id_atraccion) {
+                    
+                    a_eliminar = *enlace;
+                    *enlace = (*enlace)->sig;
+
+                    if (a_eliminar->datos != NULL) {
+                        
+                        aux_fila = a_eliminar->datos->cola_general.frente;
+                        while (aux_fila != NULL) {
+                            sig_fila = aux_fila->sig;
+                            free(aux_fila);
+                            aux_fila = sig_fila;
+                        }
+
+                        aux_fila = a_eliminar->datos->cola_prioritaria.frente;
+                        while (aux_fila != NULL) {
+                            sig_fila = aux_fila->sig;
+                            free(aux_fila);
+                            aux_fila = sig_fila;
+                        }
+
+                        free(a_eliminar->datos->nombre);
+                        free(a_eliminar->datos->tematica);
+                        free(a_eliminar->datos->estado);
+
+                        free(a_eliminar->datos);
+                    }
+
+                    free(a_eliminar);
+
+                    return 0;
+                }
+                
+                enlace = &((*enlace)->sig);
+            }
+        }
         zona_actual = zona_actual->sig;
     }
 
-    return NULL;
+    return -2; /* ATRACCION NO ENCONTRADA */
 }
 
-struct Atraccion *crear_atraccion(char *nombre, char *estado, char *tematica,
-                                  int duracion, int edad_min, float altura_min,
-                                  int cap_max) {
-    struct Atraccion *a;
+int mover_atraccion(struct NodoZonas *head_zonas, struct Zona *zona_objetivo, int id_atraccion) {
+    int contador_atracciones;
+    struct NodoZonas *zona_actual;
+    struct Zona *zona_inicio;
+    struct NodoAtraccion *actual_atr;
+    struct NodoAtraccion **enlace;
+    struct NodoAtraccion *nodo_a_mover;
 
-    if (!estado_atraccion_valido(estado)) {
-        return NULL;
+    if (head_zonas == NULL || zona_objetivo == NULL) {
+        return -1; /* ERR_PUNTERO_NULO */
     }
 
-    a = (struct Atraccion *) malloc(sizeof(struct Atraccion));
-    if (a == NULL) {
-        return NULL;
-    }
+    zona_inicio = NULL;
+    zona_actual = head_zonas;
 
-    a->nombre   = copiar_texto(nombre);
-    a->estado   = copiar_texto(estado);
-    a->tematica = copiar_texto(tematica);
-
-    if (a->nombre == NULL || a->estado == NULL || a->tematica == NULL) {
-        free(a->nombre);
-        free(a->estado);
-        free(a->tematica);
-        free(a);
-        return NULL;
-    }
-
-    a->duracion          = duracion;
-    a->edad_min          = edad_min;
-    a->altura_min        = altura_min;
-    a->cap_max           = cap_max;
-    a->visitantes_totales = 0;
-
-    a->pico_cola_general = 0;
-    a->pico_cola_prioritaria = 0;
-
-    inicializar_fila(&a->cola_general);
-    inicializar_fila(&a->cola_prioritaria);
-
-    return a;
-}
-
-int agregar_atraccion(struct Zona *z, struct Atraccion *a) {
-    struct NodoAtraccion *nuevo;
-    struct NodoAtraccion *actual;
-
-    if (z == NULL || a == NULL) {
-        return ATRACCION_ERROR;
-    }
-
-    if (contar_atracciones(z) >= z->atracciones_max) {
-        return ATRACCION_ERROR;
-    }
-
-    nuevo = (struct NodoAtraccion *) malloc(sizeof(struct NodoAtraccion));
-    if (nuevo == NULL) {
-        return ATRACCION_ERROR;
-    }
-
-    nuevo->datos = a;
-    nuevo->sig   = NULL;
-
-    if (z->head_atracciones == NULL) {
-        z->head_atracciones = nuevo;
-    } else {
-        actual = z->head_atracciones;
-        while (actual->sig != NULL) {
-            actual = actual->sig;
-        }
-        actual->sig = nuevo;
-    }
-
-    return ATRACCION_OK;
-}
-
-void eliminar_atraccion(struct Zona *z, char *nombre) {
-    struct NodoAtraccion *actual;
-    struct NodoAtraccion *previo;
-
-    if (z == NULL || nombre == NULL) {
-        return;
-    }
-
-    actual = z->head_atracciones;
-    previo = NULL;
-
-    while (actual != NULL) {
-        if (actual->datos != NULL && strcmp(actual->datos->nombre, nombre) == 0) {
-            if (previo == NULL) {
-                z->head_atracciones = actual->sig;
-            } else {
-                previo->sig = actual->sig;
+    while (zona_actual != NULL && zona_inicio == NULL) {
+        if (zona_actual->datos != NULL) {
+            actual_atr = zona_actual->datos->head_atracciones;
+            
+            while (actual_atr != NULL) {
+                if (actual_atr->datos != NULL && actual_atr->datos->id == id_atraccion) {
+                    zona_inicio = zona_actual->datos; 
+                    break;
+                }
+                actual_atr = actual_atr->sig;
             }
-
-            liberar_datos_atraccion(actual->datos);
-            free(actual);
-            return;
         }
-
-        previo = actual;
-        actual = actual->sig;
-    }
-}
-
-struct Atraccion *buscar_atraccion_por_nombre(struct Zona *z, char *nombre) {
-    struct NodoAtraccion *actual;
-
-    if (z == NULL || nombre == NULL) {
-        return NULL;
+        zona_actual = zona_actual->sig;
     }
 
-    actual = z->head_atracciones;
+    if (zona_inicio == NULL) {
+        return -4; /* ERR_ATRACCION_NO_ENCONTRADA */
+    }
 
-    while (actual != NULL) {
-        if (actual->datos != NULL && strcmp(actual->datos->nombre, nombre) == 0) {
-            return actual->datos;
+    if (zona_inicio == zona_objetivo) {
+        return 0; /* EXITO */
+    }
+
+    if (zona_inicio->tematica == NULL || zona_objetivo->tematica == NULL || 
+        strcmp(zona_inicio->tematica, zona_objetivo->tematica) != 0) {
+        return -2; /* ERR_TEMATICA_INCOMPATIBLE */
+    }
+
+    contador_atracciones = 0;
+    actual_atr = zona_objetivo->head_atracciones;
+    while (actual_atr != NULL) {
+        contador_atracciones++;
+        actual_atr = actual_atr->sig;
+    }
+
+    if (contador_atracciones >= zona_objetivo->atracciones_max) {
+        return -3; /* CAPACIDAD MAX */
+    }
+
+    enlace = &zona_inicio->head_atracciones;
+    nodo_a_mover = NULL;
+
+    while (*enlace != NULL) {
+        if ((*enlace)->datos != NULL && (*enlace)->datos->id == id_atraccion) {
+            nodo_a_mover = *enlace;
+            *enlace = (*enlace)->sig;
+            break;
         }
-        actual = actual->sig;
+        enlace = &((*enlace)->sig);
     }
 
-    return NULL;
-}
-
-struct NodoAtraccion *obtener_atracciones_zona(const struct Zona *z) {
-    if (z == NULL) return NULL;
-    return z->head_atracciones;
-}
-
-int contar_atracciones(struct Zona *z) {
-    struct NodoAtraccion *actual;
-    int cont;
-
-    if (z == NULL) {
-        return 0;
+    if (nodo_a_mover != NULL) {
+        nodo_a_mover->sig = zona_objetivo->head_atracciones;
+        zona_objetivo->head_atracciones = nodo_a_mover;
     }
 
-    cont   = 0;
-    actual = z->head_atracciones;
+    return 0; /* EXITO */
+}
 
-    while (actual != NULL) {
-        cont++;
-        actual = actual->sig;
+int cambiar_estado_atraccion(struct NodoZonas *head_zonas, int id_atraccion, const char *nuevo_estado) {
+    struct NodoZonas *zona_actual;
+    struct NodoAtraccion *atraccion_actual;
+    char *temp_estado;
+
+    if (head_zonas == NULL) {
+        return -1;
     }
 
-    return cont;
-}
+    zona_actual = head_zonas;
 
-int cambiar_estado_atraccion(struct Atraccion *a, const char *nuevo_estado) {
-    char *copia;
-
-    if (a == NULL || nuevo_estado == NULL) {
-        return ATRACCION_ERROR;
+    while (zona_actual != NULL) {
+        if (zona_actual->datos != NULL) {
+            
+            atraccion_actual = zona_actual->datos->head_atracciones;
+            while (atraccion_actual != NULL) {
+                
+                if (atraccion_actual->datos != NULL && atraccion_actual->datos->id == id_atraccion) {
+                    
+                    temp_estado = copiar_string(nuevo_estado);
+                    if (temp_estado == NULL) {
+                        return -3; /* ERROR MEMORIA INSUFICIENTE */
+                    }
+                    
+                    free(atraccion_actual->datos->estado);
+                    
+                    atraccion_actual->datos->estado = temp_estado;
+                    
+                    return 0; /* EXITO */
+                }
+                atraccion_actual = atraccion_actual->sig;
+            }
+            
+        }
+        zona_actual = zona_actual->sig;
     }
 
-    if (!estado_atraccion_valido(nuevo_estado)) {
-        return ATRACCION_ERROR;
-    }
-
-    copia = copiar_texto(nuevo_estado);
-    if (copia == NULL) {
-        return ATRACCION_ERROR;
-    }
-
-    free(a->estado);
-    a->estado = copia;
-
-    if (!atraccion_operativa(a)) {
-        suspender_filas_atraccion(a, 0);
-    }
-
-    return ATRACCION_OK;
-}
-
-int cambiar_nombre_atraccion(struct Atraccion *a, const char *nuevo_nombre) {
-    char *copia;
-
-    if (a == NULL || nuevo_nombre == NULL || nuevo_nombre[0] == '\0') return ATRACCION_ERROR;
-
-    copia = copiar_texto(nuevo_nombre);
-    if (copia == NULL) return ATRACCION_ERROR;
-
-    free(a->nombre);
-    a->nombre = copia;
-    return ATRACCION_OK;
-}
-
-int cambiar_tematica_atraccion(struct Atraccion *a, const char *nueva_tematica) {
-    char *copia;
-
-    if (a == NULL || nueva_tematica == NULL || nueva_tematica[0] == '\0') return ATRACCION_ERROR;
-
-    copia = copiar_texto(nueva_tematica);
-    if (copia == NULL) return ATRACCION_ERROR;
-
-    free(a->tematica);
-    a->tematica = copia;
-    return ATRACCION_OK;
-}
-
-int cambiar_duracion_atraccion(struct Atraccion *a, int nueva_duracion) {
-    if (a == NULL || nueva_duracion <= 0) return ATRACCION_ERROR;
-    a->duracion = nueva_duracion;
-    return ATRACCION_OK;
-}
-
-int cambiar_edad_minima_atraccion(struct Atraccion *a, int nueva_edad) {
-    if (a == NULL || nueva_edad < 0) return ATRACCION_ERROR;
-    a->edad_min = nueva_edad;
-    return ATRACCION_OK;
-}
-
-int cambiar_altura_minima_atraccion(struct Atraccion *a, float nueva_altura) {
-    if (a == NULL || nueva_altura < 0.0f) return ATRACCION_ERROR;
-    a->altura_min = nueva_altura;
-    return ATRACCION_OK;
-}
-
-int cambiar_capacidad_atraccion(struct Atraccion *a, int nueva_cap) {
-    if (a == NULL || nueva_cap <= 0) return ATRACCION_ERROR;
-    a->cap_max = nueva_cap;
-    return ATRACCION_OK;
-}
-
-void actualizar_pico_cola_general(struct Atraccion *a, int tam_actual) {
-    if (a == NULL) return;
-    if (tam_actual > a->pico_cola_general)
-        a->pico_cola_general = tam_actual;
-}
-
-void actualizar_pico_cola_prioritaria(struct Atraccion *a, int tam_actual) {
-    if (a == NULL) return;
-    if (tam_actual > a->pico_cola_prioritaria)
-        a->pico_cola_prioritaria = tam_actual;
+    return -2; /* ATRACCION NO ENCONTRADA */
 }
