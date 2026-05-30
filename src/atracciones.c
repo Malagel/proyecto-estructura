@@ -4,6 +4,7 @@
 
 #include "structs.h"
 #include "filas.h"
+#include "utils.h"
 
 struct Atraccion *buscar_atraccion_por_id(struct NodoZonas *head_zonas, int id_atraccion) {
     struct NodoZonas *zona_actual;

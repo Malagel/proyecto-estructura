@@ -5,11 +5,14 @@
 #include "filas.h"
 #include "utils.h"
 #include "visitantes.h"
+#include "entradas.h"
+#include "atracciones.h"
+#include "zonas.h"
 
-extern int ENTRADA_GENERAL;
-extern int ENTRADA_INFANTIL;
-extern int ENTRADA_FAMILIAR;
-extern int ENTRADA_PRIORITARIA;
+int ENTRADA_GENERAL = 0;
+int ENTRADA_INFANTIL = 0;
+int ENTRADA_FAMILIAR = 0;
+int ENTRADA_PRIORITARIA = 0;
 
 int escoger_opcion(void) {
     char linea[100], basura;
@@ -28,7 +31,7 @@ int escoger_opcion(void) {
 }
 
 
-void menu_inicializar_parque(struct Parque *parque) {
+int menu_inicializar_parque(struct Parque *parque) {
     char linea[256];
     char token[30];
     char basura;
@@ -52,9 +55,10 @@ void menu_inicializar_parque(struct Parque *parque) {
         "          los siguientes parámetros en una sola línea y en orden.\n"
         "                  Escriba 'salir' para cerrar el programa\n"
         "=========================================================================\n\n"
-
+    );
+    printf(
         " - Los parámetros son (separados por espacios):\n"
-        "[1] Capacidad Máxima del Parque\n"
+        "[1] Capacidad Máxima de Visitantes del Parque \n"
         "[2] Precio entrada GENERAL\n"
         "[3] Precio entrada INFANTIL\n"
         "[4] Precio entrada FAMILIAR\n"
@@ -74,7 +78,7 @@ void menu_inicializar_parque(struct Parque *parque) {
 
         if (sscanf(linea, "%29s", token) == 1) {
             if (strcmp(token, "salir") == 0) {
-                return;
+                return 0;
             }
         }
 
@@ -118,16 +122,13 @@ void menu_inicializar_parque(struct Parque *parque) {
         ENTRADA_PRIORITARIA = prioritaria_buf;
 
         printf("\n[SISTEMA] ¡Parque inicializado con éxito!\n");
-        printf("Capacidad Máxima configurada: %d visitantes.\n", parque->cap_max);
-        printf("Precios de las entradas actualizados en los registros globales.\n\n");
     } else {
         printf("\n[ERROR] El puntero al parque provisto es nulo (NULL). No se pudo inicializar.\n\n");
     }
 
     printf("Presione ENTER para continuar...");
     while (getchar() != '\n');
-
-
+    return 1;
 }
 
 void mostrar_menu_principal(void) {
@@ -139,8 +140,8 @@ void mostrar_menu_principal(void) {
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                           Para salir escriba '0'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- CONTROL Y MANEJO DE PERSONAS\n"
         "[1] Control y Compra de Entradas\n"
         "[2] Manejo de Visitantes en el Parque\n"
@@ -149,7 +150,8 @@ void mostrar_menu_principal(void) {
         "- GESTIÓN DEL PARQUE\n"
         "[4] Gestionar Zonas\n"
         "[5] Gestionar Atracciones\n\n"
-        
+    );
+    printf( 
         "- REPORTES Y ESTADÍSTICAS\n"
         "[6] Ver Reporte General Del Día\n"
         "[7] Ver Reporte Sobre Atracciones Actual\n\n"
@@ -175,8 +177,8 @@ void mostrar_submenu_entradas() {
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                       Para volver atrás escriba '0'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "[1] Comprar Entrada\n"
         "[2] Eliminar Entrada del Sistema\n"
         "[3] Cambiar Estado de Entrada\n\n"
@@ -197,7 +199,6 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
     int precio_base;
     int precio_ticket;
     int exitos;
-    char *fecha_actual;
 
     precio_base = 0;
     exitos = 0;
@@ -212,8 +213,8 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         " Para comprar una entrada y agregarla, rellene los siguientes parámetros \n"
         "                        in el orden que se indica.\n" 
         "               Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: Tipo de Entrada y Cantidad a Comprar\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
@@ -300,24 +301,25 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
     }
 
     if (exitos == cantidad_buf) {
-        printf("\n[SISTEMA] ¡%d entrada(s) de tipo '%s' registrada(s) y comprada(s) con éxito!\n", exitos, tipo_buf);
+        printf("[SISTEMA] ¡%d entrada(s) de tipo '%s' registrada(s) y comprada(s) con éxito!\n", exitos, tipo_buf);
     } else if (exitos > 0) {
-        printf("\n[ALERTA] Operación parcial: Solo se registraron %d de %d entradas solicitadas.\n", exitos, cantidad_buf);
+        printf("[ALERTA] Operación parcial: Solo se registraron %d de %d entradas solicitadas.\n", exitos, cantidad_buf);
     } else {
-        printf("\n[ALERTA] El sistema rechazó la operacion de compra.\n");
+        printf("[ALERTA] El sistema rechazó la operacion de compra.\n");
     }
 
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
+    return;
 }
 
 void menu_eliminar_entrada(struct NodoEntradas **entradas) {
     char linea[100];
     char token[30];
-    int id_buf;
+    int id_buf = 0;
     char basura;
     int asignados;
-    int es_valido;
+    int es_valido = 0;
 
     limpiar_pantalla();
 
@@ -328,7 +330,8 @@ void menu_eliminar_entrada(struct NodoEntradas **entradas) {
         " Para eliminar una entrada del parque, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "               Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
+        "=========================================================================\n\n");
+    printf(
 
         "- INFORMACIÓN\n"
         "[1] El parámetro es únicamente la ID de la entrada\n"
@@ -381,7 +384,7 @@ void menu_eliminar_entrada(struct NodoEntradas **entradas) {
 
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
-
+    return;
 }
 
 void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
@@ -402,8 +405,8 @@ void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
         " Para cambiar el estado de la entrada, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID de la entrada, y el nuevo estado\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
@@ -485,8 +488,8 @@ void mostrar_submenu_visitantes() {
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                       Para volver atrás escriba '0'\n"
-        "=========================================================================\n\n"
-        
+        "=========================================================================\n\n");
+    printf(
         "[1] Agregar Visitante al Parque\n"
         "[2] Eliminar Visitante del Parque\n\n"
 
@@ -495,7 +498,7 @@ void mostrar_submenu_visitantes() {
     );
 }
 
-void menu_agregar_visitante(struct Parque *parque, struct NodoZonas *head_zonas) {
+void menu_agregar_visitante(struct Parque *parque) {
     char linea[256];
     char token_control[40];
     char nombre_buf[40];
@@ -523,8 +526,8 @@ void menu_agregar_visitante(struct Parque *parque, struct NodoZonas *head_zonas)
         "      Para agregar a un visitante, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: Nombre, RUT, Edad, Altura (mts) y la ID de Entrada\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
@@ -571,7 +574,7 @@ void menu_agregar_visitante(struct Parque *parque, struct NodoZonas *head_zonas)
             continue;
         }
 
-        entrada_visitante = buscar_entrada_por_id(head_zonas, id_entrada_buf);
+        entrada_visitante = buscar_entrada_por_id(parque->head_entradas, id_entrada_buf);
         if (entrada_visitante == NULL) {
             printf("[ERROR] La entrada con ID %d no existe o no está registrada en el sistema.\n\n", id_entrada_buf);
             continue;
@@ -629,8 +632,8 @@ void menu_eliminar_visitante(struct NodoVisitantes **raiz_visitantes) {
         "      Para eliminar a un visitante, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] El parámetro es únicamente el ID del visitante\n"
         "[2] La eliminación es permanente\n"
@@ -711,8 +714,8 @@ void mostrar_submenu_filas() {
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                       Para volver atrás escriba '0'\n"
-        "=========================================================================\n\n"
-        
+        "=========================================================================\n\n");
+    printf(
         "[1] Agregar Grupo a la Fila\n"
         "[2] Avanzar Fila de Atracción\n\n"
 
@@ -752,8 +755,8 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
         " Para agregar un grupo a la atracción, rellene los siguientes parámetros\n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: IDs del Grupo, Tipo de Fila, ID de Atracción\n"
         "[2] Máximo 10 IDs de integrantes pueden estar en el grupo.\n"
@@ -827,7 +830,7 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
         }
 
         if (parque != NULL) {
-            atr_encontrada = buscar_atraccion(parque->head_zonas, id_atraccion);
+            atr_encontrada = buscar_atraccion_por_id(parque->head_zonas, id_atraccion);
         }
         
         if (atr_encontrada == NULL) {
@@ -903,8 +906,8 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
         "           Para avanzar las filas, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la atracción\n"
         "[2] Esto avanzará ambas filas dependiendo de su capacidad\n"
@@ -987,11 +990,11 @@ void mostrar_submenu_zonas() {
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                       Para volver atrás escriba '0'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "[1] Agregar Zona al Parque\n"
         "[2] Eliminar Zona Del Parque\n"
-        "[3] Agregar o Remover Visitantes de Zona\n"
+        "[3] Agregar o Remover Visitantes de Zona\n\n"
 
         "=========================================================================\n\n"
 
@@ -1028,13 +1031,13 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
         "         Para agregar una zona, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: Nombre, Temática, Capacidad, Hora Apertura,\n" 
         "Hora Cierre, y Máximo de Atracciones\n"
         "[2] Deben estar separados por un espacio y los nombres juntos.\n"
-        "[3] Los tiempos están en formato de 24 hrs."
+        "[3] Los tiempos están en formato de 24 hrs.\n"
         "[3] Por ejemplo: 'Tren_de_la_Muerte Terror 1000 1:00 5:30 10'\n\n"
 
         "=========================================================================\n\n"
@@ -1098,7 +1101,7 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] ¡Zona '%s' de temática '%s' agregada con éxito al parque!\n", nombre_buf, tematica_buf);
+            printf("[SISTEMA] ¡Zona '%s' de temática '%s' agregada con éxito al parque!\n", nombre_buf, tematica_buf);
             break;
             
         case -1:
@@ -1139,8 +1142,8 @@ void menu_eliminar_zona_del_parque(struct NodoZonas **head_zonas) {
         "       Para eliminar una zona, rellene los siguientes parámetros \n"
         "                        en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la Zona\n"
         "[2] Esto eliminará todas las atracciones con la zona del Parque\n"
@@ -1187,7 +1190,7 @@ void menu_eliminar_zona_del_parque(struct NodoZonas **head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] Zona con ID %d y todas sus atracciones asociadas eliminadas con éxito.\n", id_zona_buf);
+            printf("[SISTEMA] Zona con ID %d y todas sus atracciones asociadas eliminadas con éxito.\n", id_zona_buf);
             break;
             
         case -1:
@@ -1233,8 +1236,8 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
         " Para agregar o remover a un visitante, rellene los siguientes parámetros\n"
         "                        en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: Acción, Cantidad, ID de la Zona.\n"
         "[2] Debe usar 'agregar' y 'remover' como acciones.\n"
@@ -1304,9 +1307,9 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
     switch (resultado_logico) {
         case 0:
             if (visitantes_param > 0) {
-                printf("\n[SISTEMA] Se agregaron %d visitantes con éxito a la zona ID %d.\n", cantidad_buf, id_zona_buf);
+                printf("[SISTEMA] Se agregaron %d visitantes con éxito a la zona ID %d.\n", cantidad_buf, id_zona_buf);
             } else {
-                printf("\n[SISTEMA] Se removieron %d visitantes con éxito de la zona ID %d.\n", cantidad_buf, id_zona_buf);
+                printf("[SISTEMA] Se removieron %d visitantes con éxito de la zona ID %d.\n", cantidad_buf, id_zona_buf);
             }
             break;
             
@@ -1325,7 +1328,9 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
         case -4:
             printf("\n[ERROR] Supera cantidad mínima: No se pueden remover %d visitantes porque el aforo quedaría menor a cero.\n", cantidad_buf);
             break;
-            
+        case -5:
+            printf("\n[ERROR] La Zona ya está cerrada.\n");
+            break;
         default:
             printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
             break;
@@ -1345,8 +1350,8 @@ void mostrar_submenu_atracciones() {
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
         "                       Para volver atrás escriba '0'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "[1] Agregar Atracción a Zona\n"
         "[2] Eliminar Atracción de Zona\n"
         "[3] Mover Atracción a Distinta Zona\n"
@@ -1386,8 +1391,8 @@ void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas) {
         "       Para agregar una atracción, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID Zona, Nombre_Sin_Espacios, Temática,\n"
         "Duración, Personas por Ciclo, Edad_Min, y Altura Mínima (metros)]\n"
@@ -1448,7 +1453,7 @@ void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] ¡Atraccion '%s' agregada con exito a la zona ID %d!\n", nombre_buf, id_zona_buf);
+            printf("[SISTEMA] ¡Atraccion '%s' agregada con exito a la zona ID %d!\n", nombre_buf, id_zona_buf);
             break;
             
         case -2:
@@ -1489,8 +1494,8 @@ void menu_eliminar_atraccion_zona(struct NodoZonas *head_zonas) {
         "     Para eliminar una atracción, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la atracción.\n"
         "[2] Por ejemplo: '3'\n\n"
@@ -1536,7 +1541,7 @@ void menu_eliminar_atraccion_zona(struct NodoZonas *head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] Atracción con ID %d eliminada exitosamente del parque.\n", id_atraccion_buf);
+            printf("[SISTEMA] Atracción con ID %d eliminada exitosamente del parque.\n", id_atraccion_buf);
             break;
             
         case -1:
@@ -1581,8 +1586,8 @@ void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas) {
         "       Para mover una atracción, rellene los siguientes parámetros \n"
         "                        en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID Zona objetivo, ID Atracción.\n"
         "[2] Deben estar separados por espacios.\n"
@@ -1640,7 +1645,7 @@ void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] ¡Atracción con ID %d movida con éxito a la zona objetivo %d!\n", 
+            printf("[SISTEMA] ¡Atracción con ID %d movida con éxito a la zona objetivo %d!\n", 
                    id_atraccion_buf, id_objetivo_buf);
             break;
             
@@ -1688,8 +1693,8 @@ void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas) {
         "     Para modificar una atracción, rellene los siguientes parámetros \n"
         "                        en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
-        "=========================================================================\n\n"
-
+        "=========================================================================\n\n");
+    printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID de Atracción, y nuevo estado.\n"
         "[2] Los estados posibles son: 'operativa', 'mantenimiento', 'cerrada' y,\n" 
@@ -1753,7 +1758,7 @@ void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] Estado de la atracción %d actualizado a '%s' con éxito\n", 
+            printf("[SISTEMA] Estado de la atracción %d actualizado a '%s' con éxito\n", 
                    id_atraccion_buf, estado_buf);
             break;
             

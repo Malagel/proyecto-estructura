@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "structs.h"
+#include "utils.h"
 
 struct Visitante* buscar_visitante_por_id(struct NodoVisitantes *raiz, int id) {
     if (raiz == NULL || raiz->datos == NULL) {
@@ -38,7 +39,7 @@ int contar_dentro_parque(struct NodoVisitantes *raiz) {
         }
     }
 
-    return cuenta + contar_dentro_parque_recursivo(raiz->izq) + contar_dentro_parque_recursivo(raiz->der);
+    return cuenta + contar_dentro_parque(raiz->izq) + contar_dentro_parque(raiz->der);
 }
 
 int contar_total_visitantes(struct NodoVisitantes *raiz) {
@@ -50,7 +51,7 @@ int contar_total_visitantes(struct NodoVisitantes *raiz) {
 
     cuenta = (raiz->datos != NULL) ? 1 : 0;
 
-    return cuenta + contar_total_visitantes_recursivo(raiz->izq) + contar_total_visitantes_recursivo(raiz->der);
+    return cuenta + contar_total_visitantes(raiz->izq) + contar_total_visitantes(raiz->der);
 }
 
 int total_personas_diario_parque(struct Parque *parque) {
@@ -98,7 +99,7 @@ int agregar_visitante(struct Parque *parque, struct Entrada *entrada, char *nomb
         return -1; /* ERR PARQUE NULO */
     }
 
-    if (contar_dentro_parque_recursivo(parque->raiz_visitantes) + 1 > parque->cap_max){
+    if (contar_dentro_parque(parque->raiz_visitantes) + 1 > parque->cap_max){
         return -3; /* Capacidad máxima de parque alcanzada */
     }
 

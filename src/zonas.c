@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "structs.h"
 #include "atracciones.h"
 #include "zonas.h"
+#include "utils.h"
 
 struct Zona *obtener_zona_por_id(struct NodoZonas *head_zonas, int id_zona) {
     struct NodoZonas *actual;
@@ -164,6 +166,11 @@ int eliminar_zona(struct NodoZonas **head_zonas, int id) {
 int agregar_o_remover_visitantes_zona(struct NodoZonas *head_zonas, int id, int visitantes) {
     struct NodoZonas *actual;
     int nuevo_total;
+    
+    struct Tiempo hora_actual;
+    int mins_actuales;
+    int mins_apertura;
+    int mins_cierre;
 
     if (head_zonas == NULL) {
         return -1; /* LISTA NULA */
@@ -174,6 +181,18 @@ int agregar_o_remover_visitantes_zona(struct NodoZonas *head_zonas, int id, int 
     while (actual != NULL) {
         if (actual->datos != NULL && actual->datos->id == id) {
             
+            if (visitantes > 0) {
+                hora_actual = obtener_hora_actual();
+                
+                mins_actuales = (hora_actual.hora * 60) + hora_actual.minutos;
+                mins_apertura = (actual->datos->hora_apertura.hora * 60) + actual->datos->hora_apertura.minutos;
+                mins_cierre = (actual->datos->hora_cierre.hora * 60) + actual->datos->hora_cierre.minutos;
+                
+                if (mins_actuales < mins_apertura || mins_actuales >= mins_cierre) {
+                    return -5; /* ZONA CERRADA POR HORARIO */
+                }
+            }
+
             nuevo_total = actual->datos->visitantes_actuales + visitantes;
 
             if (nuevo_total > actual->datos->cap_max) {
@@ -185,7 +204,7 @@ int agregar_o_remover_visitantes_zona(struct NodoZonas *head_zonas, int id, int 
             }
 
             actual->datos->visitantes_actuales = nuevo_total;
-            return 0;
+            return 0; /* ÉXITO */
         }
         actual = actual->sig;
     }

@@ -4,6 +4,7 @@
 
 #include "structs.h"
 #include "visitantes.h"
+#include "atracciones.h"
 
 void vaciar_cola_nodos(struct Fila *fila) {
     struct NodoFila *actual;

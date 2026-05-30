@@ -3,17 +3,20 @@
 #include "structs.h"
 #include "visitantes.h"
 #include "atracciones.h"
+#include "entradas.h"
 #include "filas.h"
 #include "zonas.h"
 #include "utils.h"
 
 void ver_reporte_general_dia(struct Parque *parque) {
-    limpiar_pantalla();
-    struct Atraccion *mayor_pico, *mas_visitada;
+    struct Atraccion *mayor_pico; 
+    struct Atraccion *mas_visitada;
     int total_dentro_parque, total_visitantes, mayor_espera, recaudacion;
 
+    limpiar_pantalla();
+
     if (parque == NULL) {
-        printf("Error: No se puede generar el reporte (Estructura del parque no inicializada).\n");
+        printf("[ERROR]: No se puede generar el reporte (Estructura del parque no inicializada).\n");
         printf("\nPresione ENTER para regresar al menu principal...");
         while (getchar() != '\n');
         return;
@@ -23,7 +26,7 @@ void ver_reporte_general_dia(struct Parque *parque) {
     mayor_pico = obtener_atraccion_mayor_pico(parque);
 
     if (mas_visitada == NULL || mayor_pico == NULL || mayor_pico->cap_max == 0) {
-        printf("Error: No se puede generar el reporte (Datos insuficientes o inválidos en las atracciones).\n");
+        printf("[ERROR]: No se puede generar el reporte (Datos insuficientes o inválidos en las atracciones).\n");
         printf("\nPresione ENTER para regresar al menu principal...");
         while (getchar() != '\n');
         return;
@@ -61,7 +64,6 @@ void ver_reporte_general_dia(struct Parque *parque) {
 }
 
 void ver_reporte_atracciones_actual(struct NodoZonas *head_zonas) {
-    limpiar_pantalla();
     struct NodoZonas *zona_act;
     struct NodoAtraccion *atr_act;
     
@@ -72,6 +74,8 @@ void ver_reporte_atracciones_actual(struct NodoZonas *head_zonas) {
     int i;
     int j;
     int pos;
+
+    limpiar_pantalla();
 
     if (head_zonas == NULL) {
         printf("\n[ERROR] No hay zonas registradas.\n");
@@ -155,10 +159,11 @@ void ver_reporte_atracciones_actual(struct NodoZonas *head_zonas) {
 }
 
 void ver_atracciones_actuales(struct NodoZonas *head_zonas) {
-    limpiar_pantalla();
     struct NodoZonas *zona_act;
     struct NodoAtraccion *atr_act;
     int contador_atracciones;
+    
+    limpiar_pantalla();
 
     if (head_zonas == NULL) {
         printf("Error: La lista de zonas del parque esta vacia.\n");
@@ -206,9 +211,9 @@ void ver_atracciones_actuales(struct NodoZonas *head_zonas) {
 }
 
 void ver_zonas_actuales(struct NodoZonas *head_zonas) {
-    limpiar_pantalla();
     struct NodoZonas *actual;
     int contador_zonas;
+    limpiar_pantalla();
 
     if (head_zonas == NULL) {
         printf("[ERROR] La lista de zonas del parque esta vacía.\n");
@@ -274,8 +279,8 @@ static void recorrer_e_imprimir_visitantes(struct NodoVisitantes *raiz, int *con
 }
 
 void ver_visitantes_parque(struct NodoVisitantes *raiz_visitantes) {
-    limpiar_pantalla();
     int total_visitantes;
+    limpiar_pantalla();
 
     if (raiz_visitantes == NULL) {
         printf("[ERROR] El parque no tiene visitantes registrados en este momento.\n");
@@ -306,9 +311,9 @@ void ver_visitantes_parque(struct NodoVisitantes *raiz_visitantes) {
 }
 
 void ver_entradas_compradas(struct NodoEntradas *head_entradas) {
-    limpiar_pantalla();
     struct NodoEntradas *actual;
     int contador_entradas;
+    limpiar_pantalla();
 
     if (head_entradas == NULL) {
         printf("[ERROR] No hay entradas registradas en el sistema.\n");
@@ -350,12 +355,12 @@ void ver_entradas_compradas(struct NodoEntradas *head_entradas) {
 }
 
 void ver_filas_atracciones(struct NodoZonas *head_zonas) {
-    limpiar_pantalla();
     struct NodoZonas *zona_act;
     struct NodoAtraccion *atr_act;
     struct NodoFila *act_fila;
     int primero;
     int k;
+    limpiar_pantalla();
 
     if (head_zonas == NULL) {
         printf("[ERROR] No hay zonas registradas.\n");
