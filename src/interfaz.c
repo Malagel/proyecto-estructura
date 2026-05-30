@@ -764,6 +764,7 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
    
 }
 
+
 void mostrar_submenu_zonas() {
     limpiar_pantalla();
 
@@ -777,8 +778,7 @@ void mostrar_submenu_zonas() {
 
         "[1] Agregar Zona al Parque\n"
         "[2] Eliminar Zona Del Parque\n"
-        "[3] Agregar Visitantes a Zona\n"
-        "[4] Remover Visitantes de Zona\n\n"
+        "[3] Agregar o Remover Visitantes de Zona\n"
 
         "=========================================================================\n\n"
 
@@ -786,21 +786,341 @@ void mostrar_submenu_zonas() {
 
 }
 
-void menu_agregar_zona_al_parque(struct NodoZonas *head_zonas) {
+void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
+    char linea[256];
+    char token_control[40];
+    char nombre_buf[40];
+    char tematica_buf[30];
+    char basura;
+
+    int cap_max_buf;
+    int h_ap_buf;
+    int m_ap_buf;
+    int h_ci_buf;
+    int m_ci_buf;
+    int max_atr_buf;
+
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+
+    es_valido = 0;
+
     limpiar_pantalla();
 
+    printf(
+        "=========================================================================\n"
+        "                              ++ AGREGAR ZONA ++\n"
+        "=========================================================================\n"
+        "         Para agregar una zona, rellene los siguientes parámetros \n"
+        "                         en el orden que se indica.\n" 
+        "                 Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
+
+        "- INFORMACIÓN\n"
+        "[1] Los parámetros son: Nombre, Temática, Capacidad, Hora Apertura,\n" 
+        "Hora Cierre, y Máximo de Atracciones\n"
+        "[2] Deben estar separados por un espacio y los nombres juntos.\n"
+        "[3] Los tiempos están en formato de 24 hrs."
+        "[3] Por ejemplo: 'Tren_de_la_Muerte Terror 1000 1:00 5:30 10'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%39s", token_control) == 1) {
+            if (strcmp(token_control, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%39s %29s %d %d:%d %d:%d %d %c",
+                           nombre_buf, tematica_buf, &cap_max_buf, 
+                           &h_ap_buf, &m_ap_buf, &h_ci_buf, &m_ci_buf, 
+                           &max_atr_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] No se detectó ningún ingreso válido. Intente de nuevo.\n\n");
+            continue;
+        }
+
+        if (asignados < 8) {
+            printf("[ERROR] Datos incompletos o formato de hora incorrecto. Recuerde usar el formato HH:MM.\n");
+            printf("[INFO] Se interpretaron con éxito sólo %d de los sub-parámetros.\n\n", asignados);
+            continue;
+        }
+
+        if (asignados > 8) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (cap_max_buf <= 0 || max_atr_buf <= 0) {
+            printf("[ERROR] La capacidad máxima y el máximo de atracciones deben ser números positivos.\n\n");
+            continue;
+        }
+
+        if (h_ap_buf < 0 || h_ap_buf > 23 || m_ap_buf < 0 || m_ap_buf > 59) {
+            printf("[ERROR] Hora de apertura inválida (%d:%02d). Ingrese un tiempo válido entre 00:00 y 23:59.\n\n", h_ap_buf, m_ap_buf);
+            continue;
+        }
+
+        if (h_ci_buf < 0 || h_ci_buf > 23 || m_ci_buf < 0 || m_ci_buf > 59) {
+            printf("[ERROR] Hora de cierre inválida (%d:%02d). Ingrese un tiempo válido entre 00:00 y 23:59.\n\n", h_ci_buf, m_ci_buf);
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = agregar_zona(head_zonas, nombre_buf, tematica_buf, cap_max_buf, 
+                                    h_ap_buf, h_ci_buf, m_ap_buf, m_ci_buf, max_atr_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] ¡Zona '%s' de temática '%s' agregada con éxito al parque!\n", nombre_buf, tematica_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Raíz nula: La estructura de control (head_zonas) no está inicializada.\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] Error de memoria: No hay suficiente espacio dinámico en el sistema.\n");
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menú principal..");
+    while (getchar() != '\n');
 }
 
-void menu_agregar_visitante_zona(struct NodoZonas *head_zonas) {
+void menu_eliminar_zona_del_parque(struct NodoZonas **head_zonas) {
+    char linea[100];
+    char token[30];
+    char basura;
+    int id_zona_buf;
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+
+    es_valido = 0;
+    id_zona_buf = 0;
+
     limpiar_pantalla();
 
+    printf(
+        "=========================================================================\n"
+        "                             ++ ELIMINAR ZONA ++\n"
+        "=========================================================================\n"
+        "       Para eliminar una zona, rellene los siguientes parámetros \n"
+        "                        en el orden que se indica.\n" 
+        "                 Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
+
+        "- INFORMACIÓN\n"
+        "[1] El único parámetro es la ID de la Zona\n"
+        "[2] Esto eliminará todas las atracciones con la zona del Parque\n"
+        "[3] Por ejemplo: '21'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%d %c", &id_zona_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] Formato incorrecto. Debe ingresar un ID numérico entero.\n\n");
+            continue;
+        }
+
+        if (asignados > 1) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (id_zona_buf <= 0) {
+            printf("[ERROR] ID inválido. El identificador debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = eliminar_zona(head_zonas, id_zona_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] Zona con ID %d y todas sus atracciones asociadas eliminadas con éxito.\n", id_zona_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Lista vacía: No existen zonas registradas en el parque actualmente.\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] No encontrada: No se encontró ninguna zona con el ID %d en el sistema.\n", id_zona_buf);
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menú principal...");
+    while (getchar() != '\n');
 }
 
-void menu_remover_visitante_zona(struct NodoZonas *head_zonas) {
+void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
+    char linea[150];
+    char token_control[40];
+    char accion_buf[30];
+    char basura;
+    int cantidad_buf;
+    int id_zona_buf;
+    int asignados;
+    int es_valido;
+    int visitantes_param;
+    int resultado_logico;
+
+    es_valido = 0;
+    cantidad_buf = 0;
+    id_zona_buf = 0;
+    visitantes_param = 0;
+
     limpiar_pantalla();
 
-}
+    printf(
+        "=========================================================================\n"
+        "                  ++ AGREGAR O REMOVER VISITANTE DE ZONA ++\n"
+        "=========================================================================\n"
+        " Para agregar o remover a un visitante, rellene los siguientes parámetros\n"
+        "                        en el orden que se indica.\n" 
+        "                 Para volver atrás y cancelar escriba 'volver'\n"
+        "=========================================================================\n\n"
 
+        "- INFORMACIÓN\n"
+        "[1] Los parámetros son: Acción, Cantidad, ID de la Zona.\n"
+        "[2] Debe usar 'agregar' y 'remover' como acciones.\n"
+        "[3] Por ejemplo: 'remover 23 2'\n\n"
+
+        "=========================================================================\n\n"
+    );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%39s", token_control) == 1) {
+            if (strcmp(token_control, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%29s %d %d %c", accion_buf, &cantidad_buf, &id_zona_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] No se detectó ningún ingreso válido. Intente de nuevo.\n\n");
+            continue;
+        }
+
+        if (asignados < 3) {
+            printf("[ERROR] Datos incompletos. Debe ingresar la acción (agregar/remover), la cantidad y la ID de la zona.\n\n");
+            continue;
+        }
+
+        if (asignados > 3) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (strcmp(accion_buf, "agregar") != 0 && strcmp(accion_buf, "remover") != 0) {
+            printf("[ERROR] Acción '%s' no válida.\n", accion_buf);
+            printf("[INFO] Use estrictamente las palabras 'agregar' o 'remover' en minúsculas.\n\n");
+            continue;
+        }
+
+        if (cantidad_buf <= 0) {
+            printf("[ERROR] La cantidad de visitantes debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        if (id_zona_buf <= 0) {
+            printf("[ERROR] ID de la zona inválido. El identificador debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    if (strcmp(accion_buf, "agregar") == 0) {
+        visitantes_param = cantidad_buf;
+    } else {
+        visitantes_param = -cantidad_buf;
+    }
+
+    resultado_logico = agregar_o_remover_visitantes_zona(head_zonas, id_zona_buf, visitantes_param);
+
+    switch (resultado_logico) {
+        case 0:
+            if (visitantes_param > 0) {
+                printf("\n[SISTEMA] Se agregaron %d visitantes con éxito a la zona ID %d.\n", cantidad_buf, id_zona_buf);
+            } else {
+                printf("\n[SISTEMA] Se removieron %d visitantes con éxito de la zona ID %d.\n", cantidad_buf, id_zona_buf);
+            }
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Lista nula: La estructura global de zonas no ha sido inicializada.\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] No encontrada: La zona con ID %d no existe en el parque.\n", id_zona_buf);
+            break;
+            
+        case -3:
+            printf("\n[ERROR] Capacidad excedida: El ingreso de %d visitantes supera la capacidad máxima de la zona.\n", cantidad_buf);
+            break;
+            
+        case -4:
+            printf("\n[ERROR] Supera cantidad mínima: No se pueden remover %d visitantes porque el aforo quedaría menor a cero.\n", cantidad_buf);
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menú principal...");
+    while (getchar() != '\n');
+}
 
 
 void mostrar_submenu_atracciones() {

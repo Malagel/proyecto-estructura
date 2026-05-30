@@ -175,10 +175,7 @@ void ejecutar_submenu_zonas(struct NodoZonas *head_zonas) {
                 menu_eliminar_zona_del_parque(head_zonas);
                 break;
             case 3:
-                menu_agregar_visitante_zona(head_zonas);
-                break;
-            case 4:
-                menu_remover_visitante_zona(head_zonas);
+                menu_agregar_o_remover_visitante_zona(head_zonas);
                 break;
             case 0:
                 continuar = 0;
