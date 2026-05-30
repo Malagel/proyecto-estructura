@@ -119,7 +119,7 @@ struct NodoAtraccion {
 
 struct Parque {
     int cap_max;
-    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado por rut */
+    struct NodoVisitantes *raiz_visitantes; /* árbol binario ordenado por id del visitante */
     struct NodoEntradas *head_entradas; /* Simplemente enlazada */
     struct NodoZonas *head_zonas; /* Simplemente enlazada */
 };

@@ -594,6 +594,10 @@ void menu_agregar_visitante(struct Parque *parque, struct NodoZonas *head_zonas)
         case -2:
             printf("\n[ERROR] Error de memoria: No se pudo reservar espacio para el nuevo visitante.\n");
             break;
+        
+        case -3:
+            printf("\n[ERROR] El Parque llegó a su límite máximo.\n");
+            break;
             
         default:
             printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
@@ -697,6 +701,7 @@ void menu_eliminar_visitante(struct NodoVisitantes **raiz_visitantes) {
     while (getchar() != '\n');
 }
 
+
 void mostrar_submenu_filas() {
     limpiar_pantalla();
 
@@ -716,6 +721,27 @@ void mostrar_submenu_filas() {
 }
 
 void menu_agregar_grupo_fila(struct Parque *parque) {
+    char linea[256];
+    char token_control[40];
+    char tipo_buf[30];
+    char basura;
+    int ids_grupo[10];
+
+    char *ptr_linea;
+    int caracteres_leidos;
+    int asignados;
+    int tam_grupo;
+    int id_atraccion;
+    int es_prioritaria;
+    int es_valido;
+    int id_extra;
+    int resultado_logico;
+    struct Atraccion *atr_encontrada;
+
+    es_valido = 0;
+    tam_grupo = 0;
+    id_atraccion = 0;
+    atr_encontrada = NULL;
 
     limpiar_pantalla();
 
@@ -730,18 +756,144 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
 
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: IDs del Grupo, Tipo de Fila, ID de Atracción\n"
-        "[2] Los ID de los visitantes van separados por un espacio. Máximo 10.\n"
-        "[3] Los tipo de fila pueden ser 'general' o 'prioritaria'\n"
-        "[4] Por ejemplo: '1 30 9 12 general 14'\n\n"
+        "[2] Máximo 10 IDs de integrantes pueden estar en el grupo.\n"
+        "[3] Todos los parámetros deben estar separados por un espacio\n"
+        "[4] Los tipo de fila pueden ser 'general' o 'prioritaria'\n"
+        "[5] Por ejemplo: '1 30 9 12 general 14'\n\n"
 
         "=========================================================================\n\n"
     );
 
+    while (!es_valido) {
+        printf(">> ");
 
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%39s", token_control) == 1) {
+            if (strcmp(token_control, "volver") == 0) {
+                return;
+            }
+        }
+
+        ptr_linea = linea;
+        tam_grupo = 0;
+
+        while (tam_grupo < 10 && sscanf(ptr_linea, "%d%n", &ids_grupo[tam_grupo], &caracteres_leidos) == 1) {
+            tam_grupo++;
+            ptr_linea += caracteres_leidos;
+        }
+
+        if (tam_grupo == 0) {
+            printf("[ERROR] No se detectó ninguna ID de visitante al inicio. Intente de nuevo.\n\n");
+            continue;
+        }
+
+        if (tam_grupo == 10) {
+            if (sscanf(ptr_linea, "%d", &id_extra) == 1) {
+                printf("[ERROR] Excedió el límite. El grupo puede contener un máximo de 10 visitantes.\n\n");
+                continue;
+            }
+        }
+
+        asignados = sscanf(ptr_linea, "%29s %d %c", tipo_buf, &id_atraccion, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] Falta especificar el tipo de fila (general/prioritaria) y el ID de la atracción.\n\n");
+            continue;
+        }
+
+        if (asignados == 1) {
+            printf("[ERROR] Falta el último parámetro: Ingrese el ID de la atracción de destino.\n\n");
+            continue;
+        }
+
+        if (asignados > 2) {
+            printf("[ERROR] Entrada inválida. Detectados elementos desconocidos al final de la línea.\n\n");
+            continue;
+        }
+
+        if (strcmp(tipo_buf, "general") != 0 && strcmp(tipo_buf, "prioritaria") != 0) {
+            printf("[ERROR] Tipo de fila '%s' no válido.\n", tipo_buf);
+            printf("[INFO] Debe escribir exactamente 'general' o 'prioritaria' en minúsculas.\n\n");
+            continue;
+        }
+
+        if (id_atraccion <= 0) {
+            printf("[ERROR] El ID de la atracción debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        if (parque != NULL) {
+            atr_encontrada = buscar_atraccion(parque->head_zonas, id_atraccion);
+        }
+        
+        if (atr_encontrada == NULL) {
+            printf("[ERROR] La atracción con ID %d no existe en el sistema del parque.\n\n", id_atraccion);
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    es_prioritaria = (strcmp(tipo_buf, "prioritaria") == 0) ? 1 : 0;
+
+    resultado_logico = agregar_grupo_fila(parque->raiz_visitantes, atr_encontrada, ids_grupo, tam_grupo, es_prioritaria);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] Grupo de %d visitantes enviado exitosamente a la fila '%s'\n", tam_grupo, tipo_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Operación rechazada: La atracción seleccionada no se encuentra operativa actualmente.\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] Validación fallida: Una o más IDs ingresadas no corresponden a visitantes registrados.\n");
+            break;
+            
+        case -3:
+            printf("\n[ERROR] Restricción física: Uno o más integrantes del grupo no cumplen con la edad o altura mínima.\n");
+            break;
+            
+        case -4:
+            printf("\n[ERROR] Acceso denegado: Algún integrante no posee una entrada prioritaria cuando el canal lo requiere.\n");
+            break;
+            
+        case -5:
+            printf("\n[ERROR] Error crítico: No hay suficiente espacio en la memoria dinámica del sistema.\n");
+            break;
+            
+        case -10:
+            printf("\n[ERROR] Tamaño inválido: La cantidad de integrantes proporcionada no es permitida para este grupo.\n");
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("\nPresione ENTER para regresar al menú principal...");
+    while (getchar() != '\n');
 }
 
 void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
-    
+    char linea[100];
+    char token[30];
+    char basura;
+    int id_atraccion_buf;
+    int asignados;
+    int es_valido;
+    int resultado_logico;
+    struct Atraccion *atr_encontrada;
+
+    es_valido = 0;
+    id_atraccion_buf = 0;
+    atr_encontrada = NULL;
+
     limpiar_pantalla();
 
     printf(
@@ -756,12 +908,73 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la atracción\n"
         "[2] Esto avanzará ambas filas dependiendo de su capacidad\n"
-        "[4] Por ejemplo: '23'\n\n"
+        "[4] Por ejemplo:'23'\n\n"
 
         "=========================================================================\n\n"
     );
 
-   
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "volver") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%d %c", &id_atraccion_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] Formato incorrecto. Debe ingresar un ID numérico entero.\n\n");
+            continue;
+        }
+
+        if (asignados > 1) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (id_atraccion_buf <= 0) {
+            printf("[ERROR] ID inválido. El identificador debe ser un número entero positivo.\n\n");
+            continue;
+        }
+
+        atr_encontrada = buscar_atraccion_por_id(head_zonas, id_atraccion_buf);
+        if (atr_encontrada == NULL) {
+            printf("[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d.\n\n", id_atraccion_buf);
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    resultado_logico = avanzar_fila_atraccion(head_zonas, id_atraccion_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] ¡Filas de la atracción %d avanzadas con éxito!\n", id_atraccion_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] No encontrada: La atracción con ID %d no pudo ser localizada en el sistema de filas.\n", id_atraccion_buf);
+            break;
+            
+        case -2:
+            printf("\n[ERROR] Operación omitida: Ambas filas (general y prioritaria) de la atracción %d están vacías.\n", id_atraccion_buf);
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            break;
+    }
+
+    printf("Presione ENTER para regresar al menú principal...");
+    while (getchar() != '\n');
 }
 
 

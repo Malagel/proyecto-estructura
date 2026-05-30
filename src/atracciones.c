@@ -1,8 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "structs.h"
 #include "filas.h"
+
+struct Atraccion *buscar_atraccion_por_id(struct NodoZonas *head_zonas, int id_atraccion) {
+    struct NodoZonas *zona_actual;
+    struct NodoAtraccion *atraccion_actual;
+
+    if (head_zonas == NULL) {
+        return NULL;
+    }
+
+    zona_actual = head_zonas;
+
+    while (zona_actual != NULL) {
+        if (zona_actual->datos != NULL) {
+            
+            atraccion_actual = zona_actual->datos->head_atracciones;
+            while (atraccion_actual != NULL) {
+                
+                if (atraccion_actual->datos != NULL && atraccion_actual->datos->id == id_atraccion)
+                    return atraccion_actual->datos; 
+                atraccion_actual = atraccion_actual->sig;
+            }
+        }
+        zona_actual = zona_actual->sig;
+    }
+
+    return NULL;
+}
 
 int agregar_atraccion(struct NodoZonas *head_zonas, struct Zona *zona, const char *nombre, 
                       const char *tematica, int duracion, int cap_max, int edad_min, float altura_min) {
@@ -245,41 +273,29 @@ int mover_atraccion(struct NodoZonas *head_zonas, struct Zona *zona_objetivo, in
 }
 
 int cambiar_estado_atraccion(struct NodoZonas *head_zonas, int id_atraccion, const char *nuevo_estado) {
-    struct NodoZonas *zona_actual;
-    struct NodoAtraccion *atraccion_actual;
+    struct Atraccion *atraccion;
     char *temp_estado;
 
     if (head_zonas == NULL) {
-        return -1;
+        return -1; /* ZONA NULA */
     }
 
-    zona_actual = head_zonas;
-
-    while (zona_actual != NULL) {
-        if (zona_actual->datos != NULL) {
-            
-            atraccion_actual = zona_actual->datos->head_atracciones;
-            while (atraccion_actual != NULL) {
-                
-                if (atraccion_actual->datos != NULL && atraccion_actual->datos->id == id_atraccion) {
-                    
-                    temp_estado = copiar_string(nuevo_estado);
-                    if (temp_estado == NULL) {
-                        return -3; /* ERROR MEMORIA INSUFICIENTE */
-                    }
-                    
-                    free(atraccion_actual->datos->estado);
-                    
-                    atraccion_actual->datos->estado = temp_estado;
-                    
-                    return 0; /* EXITO */
-                }
-                atraccion_actual = atraccion_actual->sig;
-            }
-            
-        }
-        zona_actual = zona_actual->sig;
+    atraccion = buscar_atraccion_por_id(head_zonas, id_atraccion);
+    if (atraccion == NULL) {
+        return -2; /* ATRACCION NO ENCONTRADA */
     }
 
-    return -2; /* ATRACCION NO ENCONTRADA */
+    temp_estado = copiar_string(nuevo_estado);
+    if (temp_estado == NULL) {
+        return -3; /* ERROR MEMORIA INSUFICIENTE */
+    }
+
+    free(atraccion->estado);
+    atraccion->estado = temp_estado;
+
+    if (strcmp(nuevo_estado, "cerrada") == 0 || strcmp(nuevo_estado, "fuera_de_servicio") == 0) {
+        vaciar_filas_atraccion(head_zonas, id_atraccion);
+    }
+
+    return 0; /* EXITO */
 }

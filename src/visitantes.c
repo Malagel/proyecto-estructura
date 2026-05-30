@@ -4,44 +4,67 @@
 
 #include "structs.h"
 
-int contar_visitantes_dia(struct NodoVisitantes *visitantes){
-    if(visitantes == NULL || visitantes->datos == NULL){
-        return 0;
+struct Visitante* buscar_visitante_por_id(struct NodoVisitantes *raiz, int id) {
+    if (raiz == NULL || raiz->datos == NULL) {
+        return NULL;
     }
-    int cont = 0;
-
-    if (visitantes->datos->entrada != NULL) {
-        cont ++;
+    
+    if (raiz->datos->id == id) {
+        return raiz->datos;
     }
-
-    return cont + contar_visitantes_dia(visitantes->izq) + contar_visitantes_dia(visitantes->der);
+    
+    if (id < raiz->datos->id) {
+        return buscar_visitante_por_id(raiz->izq, id);
+    }
+    
+    return buscar_visitante_por_id(raiz->der, id);
 }
 
-int personas_dentro_parque(struct NodoVisitantes *visitantes) {
-    if (visitantes == NULL || visitantes->datos == NULL) {
-        return 0;
-    }
-    int cont = 0;
+int contar_dentro_parque_recursivo(struct NodoVisitantes *raiz) {
+    int cuenta;
 
-    if(visitantes->datos->entrada == NULL){
+    if (raiz == NULL) {
         return 0;
     }
 
-    if (strcmp(visitantes->datos->entrada->estado, "utilizada") == 0) {
-        cont++; 
+    cuenta = 0;
+
+    if (raiz->datos != NULL && 
+        raiz->datos->entrada != NULL && 
+        raiz->datos->entrada->estado != NULL) {
+        
+        if (strcmp(raiz->datos->entrada->estado, "utilizada") == 0) {
+            cuenta = 1;
+        }
     }
 
-    return cont + personas_dentro_parque(visitantes->izq) + personas_dentro_parque(visitantes->der);
+    return cuenta + contar_dentro_parque_recursivo(raiz->izq) + contar_dentro_parque_recursivo(raiz->der);
 }
 
-int falta_para_cap_max(struct Parque *parque){
-    int personas_dentro;
-    if(parque->raiz_visitantes == NULL){
-        return parque->cap_max;
-    }
-    personas_dentro = personas_dentro_parque(parque->raiz_visitantes);
+int contar_total_visitantes_recursivo(struct NodoVisitantes *raiz) {
+    int cuenta;
 
-    return parque->cap_max - personas_dentro; 
+    if (raiz == NULL) {
+        return 0;
+    }
+
+    cuenta = (raiz->datos != NULL) ? 1 : 0;
+
+    return cuenta + contar_total_visitantes_recursivo(raiz->izq) + contar_total_visitantes_recursivo(raiz->der);
+}
+
+int total_personas_diario_parque(struct Parque *parque) {
+    if (parque == NULL) {
+        return 0;
+    }
+    return contar_total_visitantes_recursivo(parque->raiz_visitantes);
+}
+
+int total_personas_dentro_parque(struct Parque *parque) {
+    if (parque == NULL) {
+        return 0;
+    }
+    return contar_dentro_parque_recursivo(parque->raiz_visitantes);
 }
 
 static int id_existe_en_arbol(struct NodoVisitantes *raiz, int id) {
@@ -75,6 +98,10 @@ int agregar_visitante(struct Parque *parque, struct Entrada *entrada, char *nomb
         return -1; /* ERR PARQUE NULO */
     }
 
+    if (contar_dentro_parque_recursivo(parque->raiz_visitantes) + 1 > parque->cap_max){
+        return -3; /* Capacidad máxima de parque alcanzada */
+    }
+    
     nueva_id = 1;
     while (id_existe_en_arbol(parque->raiz_visitantes, nueva_id)) {
         nueva_id++;
