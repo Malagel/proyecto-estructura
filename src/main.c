@@ -60,7 +60,7 @@ int main(void) {
                 ver_entradas_compradas(parque->head_entradas);
                 break;
             case 12:
-                ver_filas_de_atraccion(parque->head_zonas);
+                ver_filas_atracciones(parque->head_zonas);
             case 0:
                 continuar_programa = 0;
                 break;

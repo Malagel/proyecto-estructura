@@ -4,6 +4,30 @@
 #include <stdlib.h>
 #include <string.h>
 
+int calcular_recaudacion_entradas(struct Parque *parque) {
+    struct NodoEntradas *actual;
+    int total_recaudado;
+
+    if (parque == NULL || parque->head_entradas == NULL) {
+        return 0;
+    }
+
+    total_recaudado = 0;
+    actual = parque->head_entradas;
+
+    while (actual != NULL) {
+        if (actual->entrada != NULL) {
+            if (actual->entrada->estado == NULL || strcmp(actual->entrada->estado, "anulada") != 0) {
+                total_recaudado += actual->entrada->valor;
+            }
+        }
+        
+        actual = actual->sig;
+    }
+
+    return total_recaudado;
+}
+
 int comprar_entrada(struct NodoEntradas **entradas, char *tipo, int valor) {
     struct NodoEntradas *actual;
     struct Entrada *nueva_entrada;

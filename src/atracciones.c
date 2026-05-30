@@ -32,6 +32,87 @@ struct Atraccion *buscar_atraccion_por_id(struct NodoZonas *head_zonas, int id_a
     return NULL;
 }
 
+struct Atraccion *obtener_atraccion_mayor_pico(struct Parque *parque) {
+    struct NodoZonas *zona_actual;
+    struct NodoAtraccion *atraccion_actual;
+    struct Atraccion *atraccion_max;
+    int max_pico;
+    int suma_picos;
+
+    if (parque == NULL || parque->head_zonas == NULL) {
+        return NULL;
+    }
+
+    max_pico = -1;
+    atraccion_max = NULL;
+    
+    zona_actual = parque->head_zonas;
+    while (zona_actual != NULL) {
+        
+        if (zona_actual->datos != NULL) {
+            
+            atraccion_actual = zona_actual->datos->head_atracciones;
+            while (atraccion_actual != NULL) {
+                
+                if (atraccion_actual->datos != NULL) {
+                    suma_picos = atraccion_actual->datos->pico_cola_general + 
+                                 atraccion_actual->datos->pico_cola_prioritaria;
+
+                    if (suma_picos > max_pico) {
+                        max_pico = suma_picos;
+                        atraccion_max = atraccion_actual->datos;
+                    }
+                }
+                
+                atraccion_actual = atraccion_actual->sig;
+            }
+        }
+        
+        zona_actual = zona_actual->sig;
+    }
+
+    return atraccion_max;
+}
+
+struct Atraccion *obtener_atraccion_mas_visitada(struct Parque *parque) {
+    struct NodoZonas *zona_actual;
+    struct NodoAtraccion *atraccion_actual;
+    struct Atraccion *atraccion_max;
+    int max_visitantes;
+
+    if (parque == NULL || parque->head_zonas == NULL) {
+        return NULL;
+    }
+
+    max_visitantes = -1;
+    atraccion_max = NULL;
+
+    zona_actual = parque->head_zonas;
+    while (zona_actual != NULL) {
+
+        if (zona_actual->datos != NULL) {
+            
+            atraccion_actual = zona_actual->datos->head_atracciones;
+            while (atraccion_actual != NULL) {
+
+                if (atraccion_actual->datos != NULL) {
+                    
+                    if (atraccion_actual->datos->visitantes_totales > max_visitantes) {
+                        max_visitantes = atraccion_actual->datos->visitantes_totales;
+                        atraccion_max = atraccion_actual->datos;
+                    }
+                }
+
+                atraccion_actual = atraccion_actual->sig;
+            }
+        }
+
+        zona_actual = zona_actual->sig;
+    }
+
+    return atraccion_max;
+}
+
 int agregar_atraccion(struct NodoZonas *head_zonas, struct Zona *zona, const char *nombre, 
                       const char *tematica, int duracion, int cap_max, int edad_min, float altura_min) {
     
