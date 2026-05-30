@@ -1,8 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "filas.h"
 #include "utils.h"
 #include "visitantes.h"
+
+extern int ENTRADA_GENERAL;
+extern int ENTRADA_INFANTIL;
+extern int ENTRADA_FAMILIAR;
+extern int ENTRADA_PRIORITARIA;
 
 int escoger_opcion(void) {
     char linea[100], basura;
@@ -20,11 +27,107 @@ int escoger_opcion(void) {
     }
 }
 
-void bienvenida_y_visitantes_parque() {
+
+void menu_inicializar_parque(struct Parque *parque) {
+    char linea[256];
+    char token[30];
+    char basura;
+    int cap_max_buf;
+    int general_buf;
+    int infantil_buf;
+    int familiar_buf;
+    int prioritaria_buf;
+    int asignados;
+    int es_valido;
+
+    es_valido = 0;
+
+    limpiar_pantalla();
+
     printf(
-        "Bienvenido a IBCLANDIA!\n"
-        "Para empezar seleccione la capacidad máxima del parque:\n"
+        "=========================================================================\n"
+        "                       ++ BIENVENIDO A IBCLANDIA ++\n"
+        "=========================================================================\n"
+        "     Para empezar a manejar el sistema el día de hoy, debe ingresar\n"
+        "          los siguientes parámetros en una sola línea y en orden.\n"
+        "                  Escriba 'salir' para cerrar el programa\n"
+        "=========================================================================\n\n"
+
+        " - Los parámetros son (separados por espacios):\n"
+        "[1] Capacidad Máxima del Parque\n"
+        "[2] Precio entrada GENERAL\n"
+        "[3] Precio entrada INFANTIL\n"
+        "[4] Precio entrada FAMILIAR\n"
+        "[5] Precio entrada PRIORITARIA\n"
+        "Por ejemplo: '200000 5000 2500 10000 8000'\n\n"
+
+        "=========================================================================\n\n"
     );
+
+    while (!es_valido) {
+        printf(">> ");
+
+        if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
+            printf("[ERROR] Error crítico al leer desde el teclado.\n\n");
+            continue;
+        }
+
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "salir") == 0) {
+                return;
+            }
+        }
+
+        asignados = sscanf(linea, "%d %d %d %d %d %c", 
+                           &cap_max_buf, &general_buf, &infantil_buf, 
+                           &familiar_buf, &prioritaria_buf, &basura);
+
+        if (asignados <= 0) {
+            printf("[ERROR] No se detectó ningún ingreso válido. Intente de nuevo.\n\n");
+            continue;
+        }
+
+        if (asignados < 5) {
+            printf("[ERROR] Datos incompletos. Se procesaron solo %d de los 5 campos requeridos.\n\n", asignados);
+            continue;
+        }
+
+        if (asignados > 5) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
+            continue;
+        }
+
+        if (cap_max_buf <= 0 || general_buf < 0 || infantil_buf < 0 || familiar_buf < 0 || prioritaria_buf < 0) {
+            printf("[ERROR] Valores inválidos. La capacidad debe ser positiva y los precios no pueden ser negativos.\n\n");
+            continue;
+        }
+
+        es_valido = 1;
+    }
+
+    if (parque != NULL) {
+        parque->cap_max = cap_max_buf;
+        
+        parque->raiz_visitantes = NULL;
+        parque->head_zonas = NULL;
+        parque->head_entradas = NULL;
+
+        ENTRADA_GENERAL = general_buf;
+        ENTRADA_INFANTIL = infantil_buf;
+        ENTRADA_FAMILIAR = familiar_buf;
+        ENTRADA_PRIORITARIA = prioritaria_buf;
+
+        printf("\n[SISTEMA] ¡Parque inicializado con éxito!\n");
+        printf("Capacidad Máxima configurada: %d visitantes.\n", parque->cap_max);
+        printf("Precios de las entradas actualizados en los registros globales.\n\n");
+    } else {
+        printf("\n[ERROR] El puntero al parque provisto es nulo (NULL). No se pudo inicializar.\n\n");
+    }
+
+    printf("Presione ENTER para continuar...");
+    while (getchar() != '\n');
+
+
 }
 
 void mostrar_menu_principal(void) {
@@ -53,11 +156,15 @@ void mostrar_menu_principal(void) {
 
         "- INFORMACIÓN DEL PARQUE\n"
         "[8] Ver Atracciones Actuales\n"
-        "[9] Ver Zonas Actuales\n\n"
+        "[9] Ver Zonas Actuales\n"
+        "[10] Ver Visitantes en el Parque\n"
+        "[11] Ver Entradas Compradas\n"
+        "[12] Ver Filas de Atracción\n\n"
     
         "=========================================================================\n\n"
     );
 }
+
 
 void mostrar_submenu_entradas() {
     limpiar_pantalla();
@@ -81,33 +188,42 @@ void mostrar_submenu_entradas() {
 void menu_comprar_entrada(struct NodoEntradas **entradas) {
     char linea[150];
     char tipo_buf[30];
-    int valor_buf;
+    int cantidad_buf;
     char basura;
     int asignados;
     int es_valido;
+    
+    int i;
+    int precio_base;
+    int precio_ticket;
+    int exitos;
     char *fecha_actual;
+
+    precio_base = 0;
+    exitos = 0;
+    es_valido = 0;
 
     limpiar_pantalla();
 
     printf(
         "=========================================================================\n"
-        "                           ++ COMPRAR ENTRADA ++\n"
+        "                          ++ COMPRAR ENTRADA ++\n"
         "=========================================================================\n"
         " Para comprar una entrada y agregarla, rellene los siguientes parámetros \n"
-        "                         en el orden que se indica.\n" 
+        "                        in el orden que se indica.\n" 
         "               Para volver atrás y cancelar escriba 'volver'\n"
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: Tipo de Entrada y Valor de la Entrada\n"
+        "[1] Los parámetros son: Tipo de Entrada y Cantidad a Comprar\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
-        "[3] Los tipos de entrada son: 'general', 'infantil', 'familiar', y 'vip'\n"
-        "[4] Por ejemplo: 'vip 15000'\n\n"
+        "[3] Tipos de entrada: 'general', 'infantil', 'familiar', y 'prioritaria'\n"
+        "[4] Comprar la entrada familiar permite el ingreso gratuito de hasta otros\n"
+        "    tres miembros. Por lo que la cantidad máxima es de 4.\n"
+        "[5] Por ejemplo: 'prioritaria 4'\n\n"
 
         "=========================================================================\n\n"
     );
-
-    es_valido = 0;
 
     while (!es_valido) {
         printf(">> ");
@@ -117,7 +233,7 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
             continue;
         }
 
-        asignados = sscanf(linea, "%29s %d %c", tipo_buf, &valor_buf, &basura);
+        asignados = sscanf(linea, "%29s %d %c", tipo_buf, &cantidad_buf, &basura);
 
         if (asignados >= 1 && strcmp(tipo_buf, "volver") == 0) {
             return;
@@ -129,7 +245,7 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         }
 
         if (asignados == 1) {
-            printf("[ERROR] Falta el segundo parámetro. Debe ingresar el precio después del tipo.\n\n");
+            printf("[ERROR] Falta el segundo parámetro. Debe ingresar la cantidad después del tipo.\n\n");
             continue;
         }
 
@@ -141,23 +257,52 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         if (strcmp(tipo_buf, "general") != 0 && 
             strcmp(tipo_buf, "infantil") != 0 && 
             strcmp(tipo_buf, "familiar") != 0 && 
-            strcmp(tipo_buf, "vip") != 0) {
+            strcmp(tipo_buf, "prioritaria") != 0) {
             
             printf("[ERROR] El tipo '%s' no es valido.\n", tipo_buf);
-            printf("[INFO] Tipos permitidos estrictamente en minúsculas: [general, infantil, familiar, vip]\n\n");
+            printf("[INFO] Tipos permitidos estrictamente en minúsculas: [general, infantil, familiar, prioritaria]\n\n");
             continue;
         }
 
-        if (valor_buf <= 0) {
-            printf("[ERROR] El precio (%d) no es válido. Debe ser un monto mayor a cero.\n\n", valor_buf);
+        if (cantidad_buf <= 0) {
+            printf("[ERROR] La cantidad (%d) no es válida. Debe ser mayor a cero.\n\n", cantidad_buf);
+            continue;
+        }
+
+        if (strcmp(tipo_buf, "familiar") == 0 && cantidad_buf > 4) {
+            printf("[ERROR] La cantidad máxima permitida para entradas de tipo 'familiar' es de 4.\n\n");
             continue;
         }
 
         es_valido = 1;
     }
 
-    if (comprar_entrada(entradas, tipo_buf, valor_buf)) {
-        printf("\n[SISTEMA] Entrada registrada y comprada con éxito\n");
+    if (strcmp(tipo_buf, "general") == 0) {
+        precio_base = ENTRADA_GENERAL;
+    } else if (strcmp(tipo_buf, "infantil") == 0) {
+        precio_base = ENTRADA_INFANTIL;
+    } else if (strcmp(tipo_buf, "familiar") == 0) {
+        precio_base = ENTRADA_FAMILIAR;
+    } else if (strcmp(tipo_buf, "prioritaria") == 0) {
+        precio_base = ENTRADA_PRIORITARIA;
+    }
+
+    for (i = 0; i < cantidad_buf; i++) {
+        if (strcmp(tipo_buf, "familiar") == 0 && i > 0) {
+            precio_ticket = 0;
+        } else {
+            precio_ticket = precio_base;
+        }
+
+        if (comprar_entrada(entradas, tipo_buf, precio_ticket)) {
+            exitos++;
+        }
+    }
+
+    if (exitos == cantidad_buf) {
+        printf("\n[SISTEMA] ¡%d entrada(s) de tipo '%s' registrada(s) y comprada(s) con éxito!\n", exitos, tipo_buf);
+    } else if (exitos > 0) {
+        printf("\n[ALERTA] Operación parcial: Solo se registraron %d de %d entradas solicitadas.\n", exitos, cantidad_buf);
     } else {
         printf("\n[ALERTA] El sistema rechazó la operacion de compra.\n");
     }
@@ -321,7 +466,7 @@ void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
     }
 
     if (cambiar_estado_entrada(entradas, id_buf, estado_buf)) {
-        printf("\n[SISTEMA] Estado de la entrada %d actualizado a '%s' con exito\n", id_buf, estado_buf);
+        printf("\n[SISTEMA] Estado de la entrada %d actualizado a '%s' con éxito\n", id_buf, estado_buf);
     } else {
         printf("\n[ERROR] No se encontró ninguna entrada con el ID %d o no se pudo modificar.\n", id_buf);
     }
@@ -350,22 +495,30 @@ void mostrar_submenu_visitantes() {
     );
 }
 
-void menu_agregar_visitante(struct Parque *parque) {
-    char linea[200];
+void menu_agregar_visitante(struct Parque *parque, struct NodoZonas *head_zonas) {
+    char linea[256];
+    char token_control[40];
     char nombre_buf[40];
     char rut_buf[15];
+    char basura;
+    
     int edad_buf;
     float altura_buf;
-    char basura;
+    int id_entrada_buf;
+    
     int asignados;
     int es_valido;
-    char *fecha_sistema;
+    int resultado_logico;
+    struct Entrada *entrada_visitante;
+
+    es_valido = 0;
+    entrada_visitante = NULL;
 
     limpiar_pantalla();
 
     printf(
         "=========================================================================\n"
-        "                            ++ AGREGAR VISITANTE ++\n"
+        "                          ++ AGREGAR VISITANTE ++\n"
         "=========================================================================\n"
         "      Para agregar a un visitante, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
@@ -373,78 +526,95 @@ void menu_agregar_visitante(struct Parque *parque) {
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: Nombre, RUT, Edad, y Altura (metros)\n"
+        "[1] Los parámetros son: Nombre, RUT, Edad, Altura (mts) y la ID de Entrada\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
-        "[3] El nombre no debe contener espacios (ver ejemplo)"
-        "[4] Por ejemplo: 'Juan_Perez 15936475-1 45 1.72'\n"
+        "[3] El nombre no debe contener espacios (ver ejemplo)\n"
+        "[4] Por ejemplo: 'Juan_Perez 15936475-1 45 1.72 34'\n\n"
 
         "=========================================================================\n\n"
     );
 
     while (!es_valido) {
-
         printf(">> ");
 
         if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
-            printf("[ERROR] Error critico al leer desde el teclado.\n\n");
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
             continue;
         }
 
-        if (sscanf(linea, "%39s", nombre_buf) == 1) {
-            if (strcmp(nombre_buf, "volver") == 0) {
+        if (sscanf(linea, "%39s", token_control) == 1) {
+            if (strcmp(token_control, "volver") == 0) {
                 return;
             }
         }
 
-        asignados = sscanf(linea, "%39s %14s %d %f %c", nombre_buf, rut_buf, &edad_buf, &altura_buf, &basura);
+        asignados = sscanf(linea, "%39s %14s %d %f %d %c", 
+                           nombre_buf, rut_buf, &edad_buf, &altura_buf, &id_entrada_buf, &basura);
 
         if (asignados <= 0) {
-            printf("[ERROR] No se detectó ninguna entrada. Intente de nuevo.\n\n");
+            printf("[ERROR] No se detectó ningún ingreso válido. Intente de nuevo.\n\n");
             continue;
         }
 
-        if (asignados < 4) {
-            printf("[ERROR] Datos incompletos. Asegurese de ingresar los 4 campos obligatorios.\n");
+        if (asignados < 5) {
+            printf("[ERROR] Datos incompletos. Se procesaron solo %d de los 5 campos requeridos.\n\n", asignados);
             continue;
         }
 
-        if (asignados > 4) {
-            printf("[ERROR] Entrada inválida. Escribió parametros de más al final de la linea.\n\n");
+        if (asignados > 5) {
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
             continue;
         }
 
-        if (edad_buf < 0 || edad_buf > 120) {
-            printf("[ERROR] La edad ingresada (%d) no es valida para el ingreso al parque.\n\n", edad_buf);
+        if (edad_buf < 0 || edad_buf > 120 || altura_buf <= 0.40f || altura_buf > 2.50f || id_entrada_buf <= 0) {
+            printf("[ERROR] Valores numéricos incoherentes. Verifique edad, altura e ID de entrada.\n\n");
             continue;
         }
 
-        if (altura_buf <= 0.40f || altura_buf > 2.50f) {
-            printf("[ERROR] La altura (%.2fm) es incoherente. Ingrese el valor en metros (Ej: 1.75).\n\n", altura_buf);
+        entrada_visitante = buscar_entrada_por_id(head_zonas, id_entrada_buf);
+        if (entrada_visitante == NULL) {
+            printf("[ERROR] La entrada con ID %d no existe o no está registrada en el sistema.\n\n", id_entrada_buf);
             continue;
         }
 
         es_valido = 1;
     }
 
-    if (agregar_visitante(parque, nombre_buf, rut_buf, edad_buf, altura_buf)) {
-        printf("\n[SISTEMA] Visitante registrado exitosamente en el parque\n");
-    } else {
-        printf("\n[ERROR] El sistema no pudo agregar al visitante.\n");
+    resultado_logico = agregar_visitante(parque, entrada_visitante, nombre_buf, rut_buf, edad_buf, altura_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] ¡Visitante '%s' registrado exitosamente con la entrada ID %d!\n", nombre_buf, id_entrada_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] Error del sistema: Estructura del Parque no inicializada (NULL).\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] Error de memoria: No se pudo reservar espacio para el nuevo visitante.\n");
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            break;
     }
 
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
 }
 
-void menu_eliminar_visitante(struct Parque *parque) {
+void menu_eliminar_visitante(struct NodoVisitantes **raiz_visitantes) { 
     char linea[100];
-    char rut_buf[40];
+    char token[30];
     char basura;
+    int id_buf;
     int asignados;
     int es_valido;
-    size_t largo_rut;
+    int resultado_logico;
 
     es_valido = 0;
+    id_buf = 0;
 
     limpiar_pantalla();
 
@@ -452,15 +622,15 @@ void menu_eliminar_visitante(struct Parque *parque) {
         "=========================================================================\n"
         "                        ++ ELIMINAR VISITANTE ++\n"
         "=========================================================================\n"
-        "      Para agregar a un visitante, rellene los siguientes parámetros \n"
+        "      Para eliminar a un visitante, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
         "=========================================================================\n\n"
 
         "- INFORMACIÓN\n"
-        "[1] El parámetro es únicamente el RUT del visitante\n" /* CAMBIAR A ID*/
+        "[1] El parámetro es únicamente el ID del visitante\n"
         "[2] La eliminación es permanente\n"
-        "[3] Por ejemplo: '15936475-1'\n\n"
+        "[3] Por ejemplo: '67'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -469,53 +639,62 @@ void menu_eliminar_visitante(struct Parque *parque) {
         printf(">> ");
 
         if (fgets(linea, (int)sizeof(linea), stdin) == NULL) {
-            printf("[ERROR] Error critico al leer desde el teclado.\n\n");
+            printf("[ERROR] Error crítico al leer la entrada por teclado.\n\n");
             continue;
         }
 
-        if (sscanf(linea, "%39s", rut_buf) == 1) {
-            if (strcmp(rut_buf, "volver") == 0) {
-                return; 
+        if (sscanf(linea, "%29s", token) == 1) {
+            if (strcmp(token, "volver") == 0) {
+                return;
             }
         }
 
-        asignados = sscanf(linea, "%39s %c", rut_buf, &basura);
+        asignados = sscanf(linea, "%d %c", &id_buf, &basura);
 
         if (asignados <= 0) {
-            printf("[ERROR] No se detectá ningun ingreso. Intente de nuevo.\n\n");
+            printf("[ERROR] Formato incorrecto. Debe ingresar un ID numérico entero.\n\n");
             continue;
         }
 
         if (asignados > 1) {
-            printf("[ERROR] Entrada inválida. Ingrese ÚNICAMENTE el RUT del visitante.\n\n");
+            printf("[ERROR] Entrada inválida. Escribió argumentos de más al final de la línea.\n\n");
             continue;
         }
 
-        largo_rut = strlen(rut_buf);
-
-        if (largo_rut > 10) {
-            printf("[ERROR] El RUT ingresado es demasiado largo (%lu caracteres).\n", (unsigned long)largo_rut);
-            continue;
-        }
-
-        if (largo_rut < 7) {
-            printf("[ERROR] El RUT ingresado es ridículamente corto. Verifique los datos.\n\n");
+        if (id_buf <= 0) {
+            printf("[ERROR] ID inválido. El identificador debe ser un número entero positivo.\n\n");
             continue;
         }
 
         es_valido = 1;
     }
 
-    if (eliminar_visitante(parque, rut_buf)) {
-        printf("\n[SISTEMA] El visitante con RUT %s fue eliminado exitosamente\n", rut_buf);
-    } else {
-        printf("\n[ERROR] No se pudo eliminar: El RUT %s no esta registrado en el parque.\n", rut_buf);
+    resultado_logico = eliminar_visitante(raiz_visitantes, id_buf);
+
+    switch (resultado_logico) {
+        case 0:
+            printf("\n[SISTEMA] Visitante con ID %d eliminado exitosamente de los registros.\n", id_buf);
+            break;
+            
+        case -1:
+            printf("\n[ERROR] El árbol de visitantes está vacío o no ha sido inicializado (NULL).\n");
+            break;
+            
+        case -2:
+            printf("\n[ERROR] No se pudo eliminar: El visitante con ID %d no se encuentra registrado.\n", id_buf);
+            break;
+            
+        case -3:
+            printf("\n[ERROR] Estructura corrupta: Se detectó una anomalía crítica en la integridad del árbol.\n");
+            break;
+            
+        default:
+            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            break;
     }
 
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
-
-
 }
 
 void mostrar_submenu_filas() {
@@ -544,7 +723,7 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
         "=========================================================================\n"
         "                        ++ AGREGAR GRUPO A FILA ++\n"
         "=========================================================================\n"
-        " Para agregar un grupo a la atracción, rellene los siguientes parámetros \n"
+        " Para agregar un grupo a la atracción, rellene los siguientes parámetros\n"
         "                         en el orden que se indica.\n" 
         "                 Para volver atrás y cancelar escriba 'volver'\n"
         "=========================================================================\n\n"

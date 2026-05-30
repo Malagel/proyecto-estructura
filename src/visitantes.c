@@ -44,175 +44,158 @@ int falta_para_cap_max(struct Parque *parque){
     return parque->cap_max - personas_dentro; 
 }
 
-struct Visitante* crear_visitante(char *nombre_ingresado, char *rut_ingresado, int edad_ingresada, float altura_ingresada) {
-    struct Visitante *nuevo_v;
-
-    static int generador_id = 1; 
-
-    nuevo_v = (struct Visitante *)malloc(sizeof(struct Visitante));
-
-    if (nuevo_v != NULL) {
-        nuevo_v->nombre = (char *)malloc((strlen(nombre_ingresado) + 1) * sizeof(char));
-        
-        if (nuevo_v->nombre != NULL) {
-            strcpy(nuevo_v->nombre, nombre_ingresado);
-        }
-
-        strncpy(nuevo_v->rut, rut_ingresado, 11);
-        nuevo_v->rut[11] = '\0'; 
-        
-        nuevo_v->edad = edad_ingresada;
-        nuevo_v->altura = altura_ingresada;
-        
-        nuevo_v->id = generador_id; 
-        generador_id++; 
-        
-        nuevo_v->entrada = NULL; 
-    }
-
-    return nuevo_v; 
-}
-
-int agregar_visitante(struct Parque *parque, char *nombre, char *rut, int edad, float altura) {
-    struct NodoVisitantes *nuevo_n;
+static int id_existe_en_arbol(struct NodoVisitantes *raiz, int id) {
     struct NodoVisitantes *actual;
-    struct NodoVisitantes *nodo;
-    struct Visitante *nuevo;
-    int comp;
-
-    if (parque == NULL) {
-        return 0; 
-    }
-
-    nuevo = crear_visitante(nombre, rut, edad, altura);
-
-    if (nuevo == NULL) {
-        return 0;
-    }
-
-    if (falta_para_cap_max(parque) <= 0) { 
-        free(nuevo->nombre);
-        free(nuevo);
-        return 0;
-    }
-
-    nuevo_n = (struct NodoVisitantes *)malloc(sizeof(struct NodoVisitantes));
-    if (nuevo_n == NULL) {
-        free(nuevo->nombre);
-        free(nuevo);
-        return 0;
-    }
-    nuevo_n->datos = nuevo;
-    nuevo_n->izq = NULL;
-    nuevo_n->der = NULL;
-
-    if (parque->raiz_visitantes == NULL) {
-        parque->raiz_visitantes = nuevo_n;
-        return 1;
-    }
-
-    actual = parque->raiz_visitantes;
-    nodo = NULL;
-
+    actual = raiz;
+    
     while (actual != NULL) {
-        nodo = actual;
-        comp = nuevo->id - actual->datos->id;
-
-        if (comp < 0) {
-            actual = actual->izq; 
-        } else if (comp > 0) {
-            actual = actual->der; 
-        } else {
-            free(nuevo_n);
-            free(nuevo->nombre);
-            free(nuevo);
-            return 0;
-        }
-    }
-
-    if (comp < 0) {
-        nodo->izq = nuevo_n;
-    } else {
-        nodo->der = nuevo_n;
-    }
-    
-    return 1; 
-}
-
-int eliminar_visitante(struct NodoVisitantes **raiz_visitantes, char *rut) {
-    struct NodoVisitantes *actual;
-    struct NodoVisitantes *n;
-    struct NodoVisitantes *ns;
-    struct NodoVisitantes *sucesor;
-    struct NodoVisitantes *n_sucesor;
-    int comp, vef = 0;
-
-    if (raiz_visitantes == NULL || *raiz_visitantes == NULL || rut == NULL) {
-        return -1;
-    }
-    
-    actual = *raiz_visitantes;
-    n = NULL;
-
-    while (actual != NULL && vef != 1) {
-        comp = strcmp(rut, actual->datos->rut);
-        
-        if (comp == 0) {
-            vef = 1;
-        } else {
-            n = actual;
-            if (comp < 0) {
+        if (actual->datos != NULL) {
+            if (id == actual->datos->id) {
+                return 1; /* ID encontrada */
+            }
+            if (id < actual->datos->id) {
                 actual = actual->izq;
             } else {
                 actual = actual->der;
             }
+        } else {
+            break;
         }
     }
-    
-    if (actual == NULL) {
-        return -1; 
+    return 0; /* ID libre */
+}
+
+int agregar_visitante(struct Parque *parque, struct Entrada *entrada, char *nombre, char *rut, int edad, float altura) {
+    int nueva_id;
+    struct NodoVisitantes **enlace;
+    struct NodoVisitantes *nuevo_nodo;
+    struct Visitante *nuevo_visitante;
+
+    if (parque == NULL) {
+        return -1; /* ERR PARQUE NULO */
     }
 
-    if (actual->izq == NULL || actual->der == NULL) {
-        if (actual->izq == NULL) {
-            ns = actual->der;
-        } else {
-            ns = actual->izq;
-        }
+    nueva_id = 1;
+    while (id_existe_en_arbol(parque->raiz_visitantes, nueva_id)) {
+        nueva_id++;
+    }
 
-        if (n == NULL) {
-            *raiz_visitantes = ns;
-        } else if (n->izq == actual) {
-            n->izq = ns;
-        } else {
-            n->der = ns;
-        }
+    nuevo_nodo = (struct NodoVisitantes *)malloc(sizeof(struct NodoVisitantes));
+    nuevo_visitante = (struct Visitante *)malloc(sizeof(struct Visitante));
 
-        free(actual->datos->nombre);
-        free(actual->datos);
-        free(actual);
+    if (nuevo_nodo == NULL || nuevo_visitante == NULL) {
+        free(nuevo_nodo);
+        free(nuevo_visitante);
+        return -2; /* ERR MEMORIA INSUFICIENTE */
+    }
+
+    nuevo_visitante->nombre = copiar_string(nombre);
+    if (nuevo_visitante->nombre == NULL) {
+        free(nuevo_visitante);
+        free(nuevo_nodo);
+        return -2; /* ERR MEMORIA INSUFICIENTE */
+    }
+
+    strncpy(nuevo_visitante->rut, rut, 10);
+    nuevo_visitante->rut[10] = '\0';
+
+    nuevo_visitante->id = nueva_id;
+    nuevo_visitante->edad = edad;
+    nuevo_visitante->altura = altura;
+    nuevo_visitante->entrada = entrada;
+    nuevo_visitante->entrada->estado = copiar_string("utilizada");
+
+    nuevo_nodo->datos = nuevo_visitante;
+    nuevo_nodo->izq = NULL;
+    nuevo_nodo->der = NULL;
+
+    enlace = &parque->raiz_visitantes;
+    while (*enlace != NULL) {
+        if ((*enlace)->datos != NULL) {
+            if (nueva_id < (*enlace)->datos->id) {
+                enlace = &((*enlace)->izq);
+            } else {
+                enlace = &((*enlace)->der);
+            }
+        } else {
+            break;
+        }
+    }
+
+    *enlace = nuevo_nodo;
+
+    return 0;
+}
+
+int eliminar_visitante(struct NodoVisitantes **raiz_visitantes, int id) {
+    struct NodoVisitantes **enlace;
+    struct NodoVisitantes *a_eliminar;
+    struct NodoVisitantes **sucesor;
+    struct NodoVisitantes *nodo_sucesor;
+
+    if (raiz_visitantes == NULL || *raiz_visitantes == NULL) {
+        return -1; /* ERR ARBOL VACIO O NULO */
+    }
+
+    enlace = raiz_visitantes;
+    while (*enlace != NULL) {
+        if ((*enlace)->datos != NULL) {
+            if (id == (*enlace)->datos->id) {
+                break; 
+            }
+            if (id < (*enlace)->datos->id) {
+                enlace = &((*enlace)->izq);
+            } else {
+                enlace = &((*enlace)->der);
+            }
+        } else {
+            return -3; /* ERR ESTRUCTURA CORRUPTA */
+        }
+    }
+
+    if (*enlace == NULL) {
+        return -2; /* ERR VISITANTE NO ENCONTRADO */
+    }
+
+    a_eliminar = *enlace;
+
+    if (a_eliminar->izq == NULL) {
+        *enlace = a_eliminar->der;
+        
+        if (a_eliminar->datos != NULL) {
+            free(a_eliminar->datos->nombre);
+            free(a_eliminar->datos);
+        }
+        free(a_eliminar);
+    } 
+    else if (a_eliminar->der == NULL) {
+        *enlace = a_eliminar->izq;
+        
+        if (a_eliminar->datos != NULL) {
+            free(a_eliminar->datos->nombre);
+            free(a_eliminar->datos);
+        }
+        free(a_eliminar);
     } 
     else {
-        n_sucesor = actual;
-        sucesor = actual->der;
-
-        while (sucesor->izq != NULL) {
-            n_sucesor = sucesor;
-            sucesor = sucesor->izq;
+        sucesor = &(a_eliminar->der);
+        while ((*sucesor)->izq != NULL) {
+            sucesor = &((*sucesor)->izq);
         }
-
-        free(actual->datos->nombre);
-        free(actual->datos);
-
-        actual->datos = sucesor->datos;
-
-        if (n_sucesor == actual) {
-            n_sucesor->der = sucesor->der;
-        } else {
-            n_sucesor->izq = sucesor->der;
+        
+        nodo_sucesor = *sucesor;
+        
+        if (a_eliminar->datos != NULL) {
+            free(a_eliminar->datos->nombre);
+            free(a_eliminar->datos);
         }
-        free(sucesor);
+        
+        a_eliminar->datos = nodo_sucesor->datos;
+        
+        *sucesor = nodo_sucesor->der;
+        
+        free(nodo_sucesor);
     }
-    
-    return 1; 
+
+    return 0;
 }

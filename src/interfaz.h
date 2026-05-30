@@ -1,9 +1,14 @@
 #ifndef INTERFAZ_H
 #define INTERFAZ_H
 
+extern int ENTRADA_GENERAL;
+extern int ENTRADA_INFANTIL;
+extern int ENTRADA_FAMILIAR;
+extern int ENTRADA_PRIORITARIA;
+
 int escoger_opcion(void);
 
-void bienvenida_y_visitantes_parque(void);
+void menu_inicializar_parque(struct Parque *parque);
 void mostrar_menu_principal(void);
 
 void mostrar_submenu_entradas(void);
@@ -30,5 +35,6 @@ void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas);
 void menu_remover_atraccion_zona(struct NodoZonas *head_zonas);
 void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas);
 void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas);
+
 
 #endif

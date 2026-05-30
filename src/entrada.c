@@ -102,3 +102,29 @@ int eliminar_entrada(struct NodoEntradas **entradas, int id_entrada) {
 
     return -1;
 }
+
+struct Entrada *buscar_entrada_por_id(struct NodoZonas *head_zonas, int id) {
+    struct NodoZonas *curr_zona;
+    struct NodoEntradas *curr_nodo_entrada;
+
+    curr_zona = head_zonas;
+
+    while (curr_zona != NULL) {
+        if (curr_zona->datos != NULL) {
+            curr_nodo_entrada = curr_zona->datos->head_atracciones;
+            
+            while (curr_nodo_entrada != NULL) {
+                if (curr_nodo_entrada->entrada != NULL) {
+                    if (curr_nodo_entrada->entrada->id == id) {
+                        return curr_nodo_entrada->entrada;
+                    }
+                }
+                curr_nodo_entrada = curr_nodo_entrada->sig;
+            }
+        }
+        
+        curr_zona = curr_zona->sig;
+    }
+
+    return NULL;
+}

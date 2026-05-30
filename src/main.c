@@ -1,6 +1,8 @@
 #include <stdio.h>
+
 #include "structs.h"
 #include "interfaz.h"
+#include "utils.h"
 
 void ejecutar_submenu_entradas(struct NodoEntradas **entradas);
 void ejecutar_submenu_visitantes(struct Parque *parque);
@@ -16,11 +18,10 @@ int main(void) {
     continuar_programa = 1;
 
     parque = (struct Parque *)malloc(sizeof(*parque));
-
-    bienvenida_y_visitantes_parque();
-    parque->cap_max = escoger_opcion();
+    menu_inicializar_parque(parque);
 
     while (continuar_programa) {
+        limpiar_pantalla();
         mostrar_menu_principal();
         opcion_principal = escoger_opcion();
 
@@ -41,17 +42,25 @@ int main(void) {
                 ejecutar_submenu_atracciones(parque->head_zonas);
                 break;
             case 6:
-                funcion_reporte_general_dia(parque);
+                ver_reporte_general_dia(parque);
                 break;
             case 7:
-                funcion_reporte_atracciones_actual(parque->head_zonas);
+                ver_reporte_atracciones_actual(parque->head_zonas);
                 break;
             case 8:
-                funcion_ver_atracciones_actuales(parque->head_zonas);
+                ver_atracciones_actuales(parque->head_zonas);
                 break;
             case 9:
-                funcion_ver_zonas_actuales(parque->head_zonas);
+                ver_zonas_actuales(parque->head_zonas);
                 break;
+            case 10:
+                ver_visitantes_parque(parque->raiz_visitantes);
+                break;
+            case 11:
+                ver_entradas_compradas(parque->head_entradas);
+                break;
+            case 12:
+                ver_filas_de_atraccion(parque->head_zonas);
             case 0:
                 continuar_programa = 0;
                 break;
@@ -109,7 +118,7 @@ void ejecutar_submenu_visitantes(struct Parque *parque) {
                 menu_agregar_visitante(parque);
                 break;
             case 2:
-                menu_eliminar_visitante(parque);
+                menu_eliminar_visitante(&parque->raiz_visitantes);
                 break;
             case 0:
                 continuar = 0;
