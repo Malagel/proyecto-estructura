@@ -53,7 +53,7 @@ int menu_inicializar_parque(struct Parque *parque) {
         "=========================================================================\n"
         "     Para empezar a manejar el sistema el día de hoy, debe ingresar\n"
         "          los siguientes parámetros en una sola línea y en orden.\n"
-        "                  Escriba 'salir' para cerrar el programa\n"
+        "                  Escriba '0' para cerrar el programa\n"
         "=========================================================================\n\n"
     );
     printf(
@@ -77,7 +77,7 @@ int menu_inicializar_parque(struct Parque *parque) {
         }
 
         if (sscanf(linea, "%29s", token) == 1) {
-            if (strcmp(token, "salir") == 0) {
+            if (strcmp(token, "0") == 0) {
                 return 0;
             }
         }
