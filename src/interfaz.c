@@ -350,7 +350,7 @@ void menu_eliminar_entrada(struct NodoEntradas **entradas) {
 
         if (sscanf(linea, "%29s", token) == 1) {
             if (strcmp(token, "volver") == 0) {
-                printf("\n[SISTEMA] Operacion cancelada.\n");
+                printf("[SISTEMA] Operacion cancelada.\n");
                 printf("Presione ENTER para continuar...");
                 return; 
             }
@@ -377,9 +377,9 @@ void menu_eliminar_entrada(struct NodoEntradas **entradas) {
     }
 
     if (eliminar_entrada(entradas, id_buf)) {
-        printf("\n[SISTEMA] Entrada con ID %d eliminada exitosamente.\n", id_buf);
+        printf("[SISTEMA] Entrada con ID %d eliminada exitosamente.\n", id_buf);
     } else {
-        printf("\n[ERROR] No se pudo eliminar: No se encontro ninguna entrada con el ID %d.\n", id_buf);
+        printf("[ERROR] No se pudo eliminar: No se encontro ninguna entrada con el ID %d.\n", id_buf);
     }
 
     printf("\nPresione ENTER para regresar al menu principal...");
@@ -469,9 +469,9 @@ void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
     }
 
     if (cambiar_estado_entrada(entradas, id_buf, estado_buf)) {
-        printf("\n[SISTEMA] Estado de la entrada %d actualizado a '%s' con éxito\n", id_buf, estado_buf);
+        printf("[SISTEMA] Estado de la entrada %d actualizado a '%s' con éxito\n", id_buf, estado_buf);
     } else {
-        printf("\n[ERROR] No se encontró ninguna entrada con el ID %d o no se pudo modificar.\n", id_buf);
+        printf("[ERROR] No se encontró ninguna entrada con el ID %d o no se pudo modificar.\n", id_buf);
     }
 
     printf("\nPresione ENTER para regresar al menu principal...");
@@ -587,23 +587,23 @@ void menu_agregar_visitante(struct Parque *parque) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] ¡Visitante '%s' registrado exitosamente con la entrada ID %d!\n", nombre_buf, id_entrada_buf);
+            printf("[SISTEMA] ¡Visitante '%s' registrado exitosamente con la entrada ID %d!\n", nombre_buf, id_entrada_buf);
             break;
             
         case -1:
-            printf("\n[ERROR] Error del sistema: Estructura del Parque no inicializada (NULL).\n");
+            printf("[ERROR] Error del sistema: Estructura del Parque no inicializada (NULL).\n");
             break;
             
         case -2:
-            printf("\n[ERROR] Error de memoria: No se pudo reservar espacio para el nuevo visitante.\n");
+            printf("[ERROR] Error de memoria: No se pudo reservar espacio para el nuevo visitante.\n");
             break;
         
         case -3:
-            printf("\n[ERROR] El Parque llegó a su límite máximo.\n");
+            printf("[ERROR] El Parque llegó a su límite máximo.\n");
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
             break;
     }
 
@@ -680,23 +680,23 @@ void menu_eliminar_visitante(struct NodoVisitantes **raiz_visitantes) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] Visitante con ID %d eliminado exitosamente de los registros.\n", id_buf);
+            printf("[SISTEMA] Visitante con ID %d eliminado exitosamente de los registros.\n", id_buf);
             break;
             
         case -1:
-            printf("\n[ERROR] El árbol de visitantes está vacío o no ha sido inicializado (NULL).\n");
+            printf("[ERROR] El árbol de visitantes está vacío o no ha sido inicializado (NULL).\n");
             break;
             
         case -2:
-            printf("\n[ERROR] No se pudo eliminar: El visitante con ID %d no se encuentra registrado.\n", id_buf);
+            printf("[ERROR] No se pudo eliminar: El visitante con ID %d no se encuentra registrado.\n", id_buf);
             break;
             
         case -3:
-            printf("\n[ERROR] Estructura corrupta: Se detectó una anomalía crítica en la integridad del árbol.\n");
+            printf("[ERROR] Estructura corrupta: Se detectó una anomalía crítica en la integridad del árbol.\n");
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
             break;
     }
 
@@ -847,35 +847,35 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] Grupo de %d visitantes enviado exitosamente a la fila '%s'\n", tam_grupo, tipo_buf);
+            printf("[SISTEMA] Grupo de %d visitantes enviado exitosamente a la fila '%s'\n", tam_grupo, tipo_buf);
             break;
             
         case -1:
-            printf("\n[ERROR] Operación rechazada: La atracción seleccionada no se encuentra operativa actualmente.\n");
+            printf("[ERROR] Operación rechazada: La atracción seleccionada no se encuentra operativa actualmente.\n");
             break;
             
         case -2:
-            printf("\n[ERROR] Validación fallida: Una o más IDs ingresadas no corresponden a visitantes registrados.\n");
+            printf("[ERROR] Validación fallida: Una o más IDs ingresadas no corresponden a visitantes registrados.\n");
             break;
             
         case -3:
-            printf("\n[ERROR] Restricción física: Uno o más integrantes del grupo no cumplen con la edad o altura mínima.\n");
+            printf("[ERROR] Restricción física: Uno o más integrantes del grupo no cumplen con la edad o altura mínima.\n");
             break;
             
         case -4:
-            printf("\n[ERROR] Acceso denegado: Algún integrante no posee una entrada prioritaria cuando el canal lo requiere.\n");
+            printf("[ERROR] Acceso denegado: Algún integrante no posee una entrada prioritaria cuando el canal lo requiere.\n");
             break;
             
         case -5:
-            printf("\n[ERROR] Error crítico: No hay suficiente espacio en la memoria dinámica del sistema.\n");
+            printf("[ERROR] Error crítico: No hay suficiente espacio en la memoria dinámica del sistema.\n");
             break;
             
         case -10:
-            printf("\n[ERROR] Tamaño inválido: La cantidad de integrantes proporcionada no es permitida para este grupo.\n");
+            printf("[ERROR] Tamaño inválido: La cantidad de integrantes proporcionada no es permitida para este grupo.\n");
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
             break;
     }
 
@@ -960,19 +960,19 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
 
     switch (resultado_logico) {
         case 0:
-            printf("\n[SISTEMA] ¡Filas de la atracción %d avanzadas con éxito!\n", id_atraccion_buf);
+            printf("[SISTEMA] ¡Filas de la atracción %d avanzadas con éxito!\n", id_atraccion_buf);
             break;
             
         case -1:
-            printf("\n[ERROR] No encontrada: La atracción con ID %d no pudo ser localizada en el sistema de filas.\n", id_atraccion_buf);
+            printf("[ERROR] No encontrada: La atracción con ID %d no pudo ser localizada en el sistema de filas.\n", id_atraccion_buf);
             break;
             
         case -2:
-            printf("\n[ERROR] Operación omitida: Ambas filas (general y prioritaria) de la atracción %d están vacías.\n", id_atraccion_buf);
+            printf("[ERROR] Operación omitida: Ambas filas (general y prioritaria) de la atracción %d están vacías.\n", id_atraccion_buf);
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
             break;
     }
 
@@ -1105,15 +1105,15 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
             break;
             
         case -1:
-            printf("\n[ERROR] Raíz nula: La estructura de control (head_zonas) no está inicializada.\n");
+            printf("[ERROR] Raíz nula: La estructura de control (head_zonas) no está inicializada.\n");
             break;
             
         case -2:
-            printf("\n[ERROR] Error de memoria: No hay suficiente espacio dinámico en el sistema.\n");
+            printf("[ERROR] Error de memoria: No hay suficiente espacio dinámico en el sistema.\n");
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
             break;
     }
 
@@ -1194,15 +1194,15 @@ void menu_eliminar_zona_del_parque(struct NodoZonas **head_zonas) {
             break;
             
         case -1:
-            printf("\n[ERROR] Lista vacía: No existen zonas registradas en el parque actualmente.\n");
+            printf("[ERROR] Lista vacía: No existen zonas registradas en el parque actualmente.\n");
             break;
             
         case -2:
-            printf("\n[ERROR] No encontrada: No se encontró ninguna zona con el ID %d en el sistema.\n", id_zona_buf);
+            printf("[ERROR] No encontrada: No se encontró ninguna zona con el ID %d en el sistema.\n", id_zona_buf);
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
             break;
     }
 
@@ -1314,25 +1314,25 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
             break;
             
         case -1:
-            printf("\n[ERROR] Lista nula: La estructura global de zonas no ha sido inicializada.\n");
+            printf("[ERROR] Lista nula: La estructura global de zonas no ha sido inicializada.\n");
             break;
             
         case -2:
-            printf("\n[ERROR] No encontrada: La zona con ID %d no existe en el parque.\n", id_zona_buf);
+            printf("[ERROR] No encontrada: La zona con ID %d no existe en el parque.\n", id_zona_buf);
             break;
             
         case -3:
-            printf("\n[ERROR] Capacidad excedida: El ingreso de %d visitantes supera la capacidad máxima de la zona.\n", cantidad_buf);
+            printf("[ERROR] Capacidad excedida: El ingreso de %d visitantes supera la capacidad máxima de la zona.\n", cantidad_buf);
             break;
             
         case -4:
-            printf("\n[ERROR] Supera cantidad mínima: No se pueden remover %d visitantes porque el aforo quedaría menor a cero.\n", cantidad_buf);
+            printf("[ERROR] Supera cantidad mínima: No se pueden remover %d visitantes porque el aforo quedaría menor a cero.\n", cantidad_buf);
             break;
         case -5:
-            printf("\n[ERROR] La Zona ya está cerrada.\n");
+            printf("[ERROR] La Zona ya está cerrada.\n");
             break;
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
             break;
     }
 
@@ -1457,15 +1457,15 @@ void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas) {
             break;
             
         case -2:
-            printf("\n[ERROR] Incompatibilidad: La tematica '%s' no coincide con la identidad de la zona.\n", tematica_buf);
+            printf("[ERROR] Incompatibilidad: La tematica '%s' no coincide con la identidad de la zona.\n", tematica_buf);
             break;
             
         case -3:
-            printf("\n[ERROR] Capacidad excedida: La zona ID %d no tiene espacio fisico para mas atracciones.\n", id_zona_buf);
+            printf("[ERROR] Capacidad excedida: La zona ID %d no tiene espacio fisico para mas atracciones.\n", id_zona_buf);
             break;
             
         default:
-            printf("\n[ERROR] Operacion rechazada. Codigo de error no especificado (%d).\n", resultado_logico);
+            printf("[ERROR] Operacion rechazada. Codigo de error no especificado (%d).\n", resultado_logico);
             break;
     }
 
@@ -1545,15 +1545,15 @@ void menu_eliminar_atraccion_zona(struct NodoZonas *head_zonas) {
             break;
             
         case -1:
-            printf("\n[ERROR] Error de sistema: La estructura de Zonas es nula.\n");
+            printf("[ERROR] Error de sistema: La estructura de Zonas es nula.\n");
             break;
             
         case -2:
-            printf("\n[ERROR] No se pudo eliminar: No se encontró ninguna atracción con el ID %d.\n", id_atraccion_buf);
+            printf("[ERROR] No se pudo eliminar: No se encontró ninguna atracción con el ID %d.\n", id_atraccion_buf);
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error desconocido (%d).\n", resultado_logico);
             break;
     }
 
@@ -1650,19 +1650,19 @@ void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas) {
             break;
             
         case -2:
-            printf("\n[ERROR] Incompatibilidad: La temática de la atracción no coincide con la identidad de la zona objetivo.\n");
+            printf("[ERROR] Incompatibilidad: La temática de la atracción no coincide con la identidad de la zona objetivo.\n");
             break;
             
         case -3:
-            printf("\n[ERROR] Capacidad excedida: La zona objetivo con ID %d llegó al máximo de su capacidad.\n", id_objetivo_buf);
+            printf("[ERROR] Capacidad excedida: La zona objetivo con ID %d llegó al máximo de su capacidad.\n", id_objetivo_buf);
             break;
             
         case -4:
-            printf("\n[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d en ninguna zona del parque.\n", id_atraccion_buf);
+            printf("[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d en ninguna zona del parque.\n", id_atraccion_buf);
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
             break;
     }
 
@@ -1763,19 +1763,19 @@ void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas) {
             break;
             
         case -1:
-            printf("\n[ERROR] Error de sistema: La estructura de Zonas es nula (NULL).\n");
+            printf("[ERROR] Error de sistema: La estructura de Zonas es nula (NULL).\n");
             break;
             
         case -2:
-            printf("\n[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d en el parque.\n", id_atraccion_buf);
+            printf("[ERROR] No encontrada: No se encontró ninguna atracción con el ID %d en el parque.\n", id_atraccion_buf);
             break;
             
         case -3:
-            printf("\n[ERROR] Error crítico: Falta memoria en el sistema para procesar el cambio.\n");
+            printf("[ERROR] Error crítico: Falta memoria en el sistema para procesar el cambio.\n");
             break;
             
         default:
-            printf("\n[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
+            printf("[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
             break;
     }
 
