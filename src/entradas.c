@@ -104,7 +104,7 @@ int eliminar_entrada(struct NodoEntradas **entradas, int id_entrada) {
     struct NodoEntradas *anterior;
 
     if (entradas == NULL) return -1;
-
+    
     actual = *entradas;
     anterior = NULL;
 

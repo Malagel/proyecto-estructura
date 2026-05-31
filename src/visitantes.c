@@ -131,6 +131,9 @@ int agregar_visitante(struct Parque *parque, struct Entrada *entrada, char *nomb
     nuevo_visitante->edad = edad;
     nuevo_visitante->altura = altura;
     nuevo_visitante->entrada = entrada;
+    if (nuevo_visitante->entrada->estado != NULL) {
+        free(nuevo_visitante->entrada->estado);
+    }
     nuevo_visitante->entrada->estado = copiar_string("utilizada");
 
     nuevo_nodo->datos = nuevo_visitante;
