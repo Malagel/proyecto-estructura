@@ -176,7 +176,7 @@ int avanzar_fila_atraccion(struct NodoZonas *head_zonas, int id_atraccion) {
             continue;
         }
 
-        /* CASO A: El grupo en el frente de la fila cabe perfectamente en el espacio disponible */
+        /* CASO A: El grupo en el frente de la fila cabe perfectamente */
         if (fila_actual->frente->tam_grupo <= cap_disponible) {
             temp = fila_actual->frente;
             cap_disponible -= temp->tam_grupo;
@@ -187,10 +187,13 @@ int avanzar_fila_atraccion(struct NodoZonas *head_zonas, int id_atraccion) {
             }
             free(temp);
 
-            turno_prioritaria = !turno_prioritaria;
+            /* CAMBIO: Solo alternar si la otra cola está operativa */
+            if (!*bloqueada_otra) {
+                turno_prioritaria = !turno_prioritaria;
+            }
         } 
         
-        /* CASO B: El grupo del frente excede la capacidad actual. Buscamos un grupo menor atrás. */
+        /* CASO B: El grupo del frente excede la capacidad. Buscamos atrás. */
         else {
             anterior = fila_actual->frente;
             actual = fila_actual->frente->sig;
@@ -208,14 +211,15 @@ int avanzar_fila_atraccion(struct NodoZonas *head_zonas, int id_atraccion) {
             if (encontrado) {
                 cap_disponible -= actual->tam_grupo;
                 
-                /* El grupo se "cuela" hacia adelante: lo desenlazamos de su posición intermedia */
                 anterior->sig = actual->sig;
                 if (actual == fila_actual->final) {
                     fila_actual->final = anterior;
                 }
                 free(actual);
 
-                turno_prioritaria = !turno_prioritaria;
+                if (!*bloqueada_otra) {
+                    turno_prioritaria = !turno_prioritaria;
+                }
             } else {
                 *bloqueada_actual = 1;
                 turno_prioritaria = !turno_prioritaria;
