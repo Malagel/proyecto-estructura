@@ -354,12 +354,26 @@ void ver_entradas_compradas(struct NodoEntradas *head_entradas) {
     while (getchar() != '\n');
     return;
 }
+
+
 void ver_filas_atracciones(struct NodoZonas *head_zonas) {
     struct NodoZonas *zona_act;
     struct NodoAtraccion *atr_act;
     struct NodoFila *act_fila;
     int primero;
     int k;
+    
+    int total_p;
+    int total_g;
+    int eff_p;
+    int eff_g;
+    int ciclos_p;
+    int ciclos_g;
+    int t_espera_p;
+    int t_espera_g;
+    int cap_max;
+    int duracion;
+
     limpiar_pantalla();
 
     if (head_zonas == NULL) {
@@ -378,19 +392,43 @@ void ver_filas_atracciones(struct NodoZonas *head_zonas) {
             while (atr_act != NULL) {
                 if (atr_act->datos != NULL) {
                     
-                    printf("[%03d] %s\n", 
-                           atr_act->datos->id, 
-                           atr_act->datos->nombre ? atr_act->datos->nombre : "Sin Nombre");
+                    cap_max = atr_act->datos->cap_max;
+                    duracion = atr_act->datos->duracion;
 
-                    printf("  Prio: ");
+                    total_p = 0;
+                    act_fila = atr_act->datos->cola_prioritaria.frente;
+                    while (act_fila != NULL) {
+                        total_p += act_fila->tam_grupo;
+                        act_fila = act_fila->sig;
+                    }
+
+                    total_g = 0;
+                    act_fila = atr_act->datos->cola_general.frente;
+                    while (act_fila != NULL) {
+                        total_g += act_fila->tam_grupo;
+                        act_fila = act_fila->sig;
+                    }
+
+                    eff_p = total_p + (total_p < total_g ? total_p : total_g);
+                    eff_g = total_g + (total_g < total_p ? total_g : total_p);
+
+                    ciclos_p = (eff_p + cap_max - 1) / cap_max;
+                    ciclos_g = (eff_g + cap_max - 1) / cap_max;
+
+                    t_espera_p = ciclos_p * duracion;
+                    t_espera_g = ciclos_g * duracion;
+
+                    printf("[%03d] %s (Ciclo: %d min | Cap Max: %d)\n", 
+                           atr_act->datos->id, 
+                           atr_act->datos->nombre ? atr_act->datos->nombre : "Sin Nombre",
+                           duracion, cap_max);
+
+                    printf("  Prioritaria: ");
                     act_fila = atr_act->datos->cola_prioritaria.frente;
                     primero = 1;
-                    
                     while (act_fila != NULL) {
                         for (k = 0; k < act_fila->tam_grupo; k++) {
-                            if (!primero) {
-                                printf(" -> ");
-                            }
+                            if (!primero) printf(" -> ");
                             printf("%d", act_fila->ids_grupo[k]);
                             primero = 0;
                         }
@@ -398,18 +436,17 @@ void ver_filas_atracciones(struct NodoZonas *head_zonas) {
                     }
                     if (primero) {
                         printf("(Vacia)");
+                    } else {
+                        printf(" | Espera: %d min (%d pers.)", t_espera_p, total_p);
                     }
                     printf("\n");
 
-                    printf("  Gen : ");
+                    printf("  General    : ");
                     act_fila = atr_act->datos->cola_general.frente;
                     primero = 1;
-                    
                     while (act_fila != NULL) {
                         for (k = 0; k < act_fila->tam_grupo; k++) {
-                            if (!primero) {
-                                printf(" -> ");
-                            }
+                            if (!primero) printf(" -> ");
                             printf("%d", act_fila->ids_grupo[k]);
                             primero = 0;
                         }
@@ -417,9 +454,11 @@ void ver_filas_atracciones(struct NodoZonas *head_zonas) {
                     }
                     if (primero) {
                         printf("(Vacia)");
+                    } else {
+                        printf(" | Espera: %d min (%d pers.)", t_espera_g, total_g);
                     }
                     
-                    printf("\n----------------------------------------\n");
+                    printf("\n---------------------------------------------------------\n");
                 }
                 atr_act = atr_act->sig;
             }

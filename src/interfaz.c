@@ -599,7 +599,9 @@ void menu_agregar_visitante(struct Parque *parque) {
         case -3:
             printf("[ERROR] El Parque llegó a su límite máximo.\n");
             break;
-            
+        case -4:
+            printf("[ERROR] La entrada no es válida.");
+            break;
         default:
             printf("[ALERTA] Operación rechazada. Código de error no catalogado (%d).\n", resultado_logico);
             break;

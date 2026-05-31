@@ -99,6 +99,10 @@ int agregar_visitante(struct Parque *parque, struct Entrada *entrada, char *nomb
         return -1; /* ERR PARQUE NULO */
     }
 
+    if (strcmp(entrada->estado, "utilizada") == 0) {
+        return -4; /* entrada ya en uso*/
+    }
+
     if (contar_dentro_parque(parque->raiz_visitantes) + 1 > parque->cap_max){
         return -3; /* Capacidad máxima de parque alcanzada */
     }
