@@ -121,12 +121,12 @@ int menu_inicializar_parque(struct Parque *parque) {
         ENTRADA_FAMILIAR = familiar_buf;
         ENTRADA_PRIORITARIA = prioritaria_buf;
 
-        printf("\n[SISTEMA] ¡Parque inicializado con éxito!\n");
+        printf("[SISTEMA] ¡Parque inicializado con éxito!\n");
     } else {
-        printf("\n[ERROR] El puntero al parque provisto es nulo (NULL). No se pudo inicializar.\n\n");
+        printf("[ERROR] El puntero al parque provisto es nulo (NULL). No se pudo inicializar.\n");
     }
 
-    printf("Presione ENTER para continuar...");
+    printf("\nPresione ENTER para continuar...");
     while (getchar() != '\n');
     return 1;
 }
@@ -136,10 +136,10 @@ void mostrar_menu_principal(void) {
 
     printf(
         "=========================================================================\n"
-        "                          ++ SISTEMA IBCLANDIA ++\n"
+        "                         ++ SISTEMA IBCLANDIA ++\n"
         "=========================================================================\n"
         "    Selecciona una opción escribiendo su número y presionando ENTER.\n" 
-        "                           Para salir escriba '0'\n"
+        "                          Para salir escriba '0'\n"
         "=========================================================================\n\n");
     printf(
         "- CONTROL Y MANEJO DE PERSONAS\n"
@@ -350,8 +350,6 @@ void menu_eliminar_entrada(struct NodoEntradas **entradas) {
 
         if (sscanf(linea, "%29s", token) == 1) {
             if (strcmp(token, "volver") == 0) {
-                printf("[SISTEMA] Operacion cancelada.\n");
-                printf("Presione ENTER para continuar...");
                 return; 
             }
         }
@@ -976,7 +974,7 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menú principal...");
+    printf("\nPresione ENTER para regresar al menú principal...");
     while (getchar() != '\n');
 }
 
@@ -1026,7 +1024,7 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
 
     printf(
         "=========================================================================\n"
-        "                              ++ AGREGAR ZONA ++\n"
+        "                            ++ AGREGAR ZONA ++\n"
         "=========================================================================\n"
         "         Para agregar una zona, rellene los siguientes parámetros \n"
         "                         en el orden que se indica.\n" 
@@ -1038,7 +1036,7 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
         "Hora Cierre, y Máximo de Atracciones\n"
         "[2] Deben estar separados por un espacio y los nombres juntos.\n"
         "[3] Los tiempos están en formato de 24 hrs.\n"
-        "[3] Por ejemplo: 'Tren_de_la_Muerte Terror 1000 1:00 5:30 10'\n\n"
+        "[4] Por ejemplo: 'Tren_de_la_Muerte Terror 1000 1:00 5:30 10'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1117,7 +1115,7 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menú principal..");
+    printf("\nPresione ENTER para regresar al menú principal...");
     while (getchar() != '\n');
 }
 
@@ -1206,7 +1204,7 @@ void menu_eliminar_zona_del_parque(struct NodoZonas **head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menú principal...");
+    printf("\nPresione ENTER para regresar al menú principal...");
     while (getchar() != '\n');
 }
 
@@ -1231,7 +1229,7 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
 
     printf(
         "=========================================================================\n"
-        "                  ++ AGREGAR O REMOVER VISITANTE DE ZONA ++\n"
+        "                 ++ AGREGAR O REMOVER VISITANTE DE ZONA ++\n"
         "=========================================================================\n"
         " Para agregar o remover a un visitante, rellene los siguientes parámetros\n"
         "                        en el orden que se indica.\n" 
@@ -1336,7 +1334,7 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menú principal...");
+    printf("\nPresione ENTER para regresar al menú principal...");
     while (getchar() != '\n');
 }
 
@@ -1395,7 +1393,7 @@ void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas) {
     printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID Zona, Nombre_Sin_Espacios, Temática,\n"
-        "Duración, Personas por Ciclo, Edad_Min, y Altura Mínima (metros)]\n"
+        "Duración (min), Personas por Ciclo, Edad Mín., y Altura Mín. (metros)]\n"
         "[2] Por ejemplo: '3 Trueno_del_Dragon Aventura 4 24 10 1.20'\n\n"
 
         "=========================================================================\n\n"
@@ -1557,7 +1555,7 @@ void menu_eliminar_atraccion_zona(struct NodoZonas *head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menu principal...");
+    printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
 }
 
@@ -1666,7 +1664,7 @@ void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menu principal...");
+    printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
 
 }
@@ -1779,7 +1777,7 @@ void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas) {
             break;
     }
 
-    printf("Presione ENTER para regresar al menu principal...");
+    printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
 
 }

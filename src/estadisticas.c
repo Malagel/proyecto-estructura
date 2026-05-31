@@ -226,9 +226,9 @@ void ver_zonas_actuales(struct NodoZonas *head_zonas) {
     actual = head_zonas;
 
     printf("\n================================================================================\n");
-    printf("                          LISTADO GLOBAL DE ZONAS                               \n");
+    printf("                            LISTADO GLOBAL DE ZONAS                             \n");
     printf("================================================================================\n");
-    printf("%-6s | %-25s | %-20s | %s\n", "ID", "Nombre de la Zona", "Tematica", "Visitantes Actuales");
+    printf("%-6s | %-25s | %-20s | %s\n", "ID", "Nombre de la Zona", "Temática", "Visitantes Actuales");
     printf("--------------------------------------------------------------------------------\n");
 
     while (actual != NULL) {
@@ -237,7 +237,7 @@ void ver_zonas_actuales(struct NodoZonas *head_zonas) {
             printf("%-6d | %-25s | %-20s | %d\n",
                    actual->datos->id,
                    actual->datos->nombre ? actual->datos->nombre : "Sin Nombre",
-                   actual->datos->tematica ? actual->datos->tematica : "Sin Tematica",
+                   actual->datos->tematica ? actual->datos->tematica : "Sin Temática",
                    actual->datos->visitantes_actuales);
             
             contador_zonas++;
@@ -292,7 +292,7 @@ void ver_visitantes_parque(struct NodoVisitantes *raiz_visitantes) {
     total_visitantes = 0;
 
     printf("\n===============================================================================\n");
-    printf("                            REGISTRO GLOBAL DE VISITANTES                      \n");
+    printf("                          REGISTRO GLOBAL DE VISITANTES                      \n");
     printf("===============================================================================\n");
 
     recorrer_e_imprimir_visitantes(raiz_visitantes, &total_visitantes);
@@ -325,35 +325,35 @@ void ver_entradas_compradas(struct NodoEntradas *head_entradas) {
     contador_entradas = 0;
     actual = head_entradas;
 
-    printf("\n==================================================\n");
-    printf("           REGISTRO GLOBAL DE ENTRADAS            \n");
-    printf("==================================================\n");
-    printf("%-6s | %-20s | %s\n", "ID", "Tipo de Entrada", "Valor");
-    printf("--------------------------------------------------\n");
+    printf("\n============================================================\n");
+    printf("                REGISTRO GLOBAL DE ENTRADAS                 \n");
+    printf("============================================================\n");
+    printf("%-6s | %-15s | %-8s | %-12s\n", "ID", "Tipo", "Valor", "Estado");
+    printf("------------------------------------------------------------\n");
 
     while (actual != NULL) {
         if (actual->entrada != NULL) {
             
-            printf("%-6d | %-20s | %d\n", 
+            /* Se imprime la información alineada incluyendo el estado */
+            printf("%-6d | %-15s | %-8d | %-12s\n", 
                    actual->entrada->id, 
                    actual->entrada->tipo ? actual->entrada->tipo : "Sin Tipo",
-                   actual->entrada->valor);
+                   actual->entrada->valor,
+                   actual->entrada->estado ? actual->entrada->estado : "Sin Estado");
             
             contador_entradas++;
         }
         actual = actual->sig;
     }
 
-    printf("--------------------------------------------------\n");
+    printf("------------------------------------------------------------\n");
     printf(" Total de entradas emitidas: %d\n", contador_entradas);
-    printf("==================================================\n\n");
+    printf("============================================================\n\n");
 
     printf("\nPresione ENTER para regresar al menu principal...");
     while (getchar() != '\n');
     return;
-    
 }
-
 void ver_filas_atracciones(struct NodoZonas *head_zonas) {
     struct NodoZonas *zona_act;
     struct NodoAtraccion *atr_act;
