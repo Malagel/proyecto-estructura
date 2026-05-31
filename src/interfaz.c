@@ -221,7 +221,7 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         "[3] Tipos de entrada: 'general', 'infantil', 'familiar', y 'prioritaria'\n"
         "[4] Comprar la entrada familiar permite el ingreso gratuito de hasta otros\n"
         "    tres miembros. Por lo que la cantidad máxima es de 4.\n"
-        "[5] Por ejemplo: 'prioritaria 4'\n\n"
+        "Por ejemplo: 'prioritaria 4'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -335,7 +335,7 @@ void menu_eliminar_entrada(struct NodoEntradas **entradas) {
 
         "- INFORMACIÓN\n"
         "[1] El parámetro es únicamente la ID de la entrada\n"
-        "[2] Por ejemplo: '345'\n\n"
+        "Por ejemplo: '345'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -408,8 +408,8 @@ void menu_cambiar_estado_entrada(struct NodoEntradas **entradas) {
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID de la entrada, y el nuevo estado\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
-        "[3] Los tipos de entrada son: 'activa', 'utilizada', 'vencida', y 'anulada'\n"
-        "[4] Por ejemplo: '25 anulada'\n\n"
+        "[3] Los estados de entrada son: 'activa', 'utilizada', 'vencida', y 'anulada'\n"
+        "Por ejemplo: '25 anulada'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -530,7 +530,7 @@ void menu_agregar_visitante(struct Parque *parque) {
         "[1] Los parámetros son: Nombre, RUT, Edad, Altura (mts) y la ID de Entrada\n"
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
         "[3] El nombre no debe contener espacios (ver ejemplo)\n"
-        "[4] Por ejemplo: 'Juan_Perez 15936475-1 45 1.72 34'\n\n"
+        "Por ejemplo: 'Juan_Perez 15936475-1 45 1.72 34'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -633,9 +633,9 @@ void menu_eliminar_visitante(struct NodoVisitantes **raiz_visitantes) {
         "=========================================================================\n\n");
     printf(
         "- INFORMACIÓN\n"
-        "[1] El parámetro es únicamente el ID del visitante\n"
+        "[1] El parámetro es únicamente la ID del visitante\n"
         "[2] La eliminación es permanente\n"
-        "[3] Por ejemplo: '67'\n\n"
+        "Por ejemplo: '67'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -758,9 +758,9 @@ void menu_agregar_grupo_fila(struct Parque *parque) {
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: IDs del Grupo, Tipo de Fila, ID de Atracción\n"
         "[2] Máximo 10 IDs de integrantes pueden estar en el grupo.\n"
-        "[3] Todos los parámetros deben estar separados por un espacio\n"
-        "[4] Los tipo de fila pueden ser 'general' o 'prioritaria'\n"
-        "[5] Por ejemplo: '1 30 9 12 general 14'\n\n"
+        "[3] Los tipo de fila pueden ser 'general' o 'prioritaria'\n"
+        "[4] Todos los parámetros deben estar separados por un espacio\n"
+        "Por ejemplo: '1 30 9 12 general 14'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -909,7 +909,7 @@ void menu_avanzar_fila_atraccion(struct NodoZonas *head_zonas) {
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la atracción\n"
         "[2] Esto avanzará ambas filas dependiendo de su capacidad\n"
-        "[4] Por ejemplo:'23'\n\n"
+        "Por ejemplo:'23'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1036,7 +1036,7 @@ void menu_agregar_zona_al_parque(struct NodoZonas **head_zonas) {
         "Hora Cierre, y Máximo de Atracciones\n"
         "[2] Deben estar separados por un espacio y los nombres juntos.\n"
         "[3] Los tiempos están en formato de 24 hrs.\n"
-        "[4] Por ejemplo: 'Tren_de_la_Muerte Terror 1000 1:00 5:30 10'\n\n"
+        "Por ejemplo: 'Tren_de_la_Muerte Terror 1000 1:00 5:30 10'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1144,8 +1144,8 @@ void menu_eliminar_zona_del_parque(struct NodoZonas **head_zonas) {
     printf(
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la Zona\n"
-        "[2] Esto eliminará todas las atracciones con la zona del Parque\n"
-        "[3] Por ejemplo: '21'\n\n"
+        "[2] Esto eliminará todas las atracciones dentro de la Zona\n"
+        "Por ejemplo: '21'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1238,7 +1238,7 @@ void menu_agregar_o_remover_visitante_zona(struct NodoZonas *head_zonas) {
     printf(
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: Acción, Cantidad, ID de la Zona.\n"
-        "[2] Debe usar 'agregar' y 'remover' como acciones.\n"
+        "[2] Debe usar 'agregar' o 'remover' como acciones.\n"
         "[3] Por ejemplo: 'remover 23 2'\n\n"
 
         "=========================================================================\n\n"
@@ -1392,9 +1392,10 @@ void menu_agregar_atraccion_zona(struct NodoZonas *head_zonas) {
         "=========================================================================\n\n");
     printf(
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: ID Zona, Nombre_Sin_Espacios, Temática,\n"
-        "Duración (min), Personas por Ciclo, Edad Mín., y Altura Mín. (metros)]\n"
-        "[2] Por ejemplo: '3 Trueno_del_Dragon Aventura 4 24 10 1.20'\n\n"
+        "[1] Los parámetros son: ID Zona, Nombre, Temática, Duración (minutos), \n"
+        "    Capacidad por Ciclo, Edad Mínima, y Altura Mínima (metros).\n"
+        "[2] Textos como el Nombre no deben contener espacios (usar '_')."
+        "Por ejemplo: '3 Trueno_del_Dragon Aventura 4 24 10 1.20'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1496,7 +1497,7 @@ void menu_eliminar_atraccion_zona(struct NodoZonas *head_zonas) {
     printf(
         "- INFORMACIÓN\n"
         "[1] El único parámetro es la ID de la atracción.\n"
-        "[2] Por ejemplo: '3'\n\n"
+        "Por ejemplo: '3'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1589,7 +1590,7 @@ void menu_mover_atraccion_distinta_zona(struct NodoZonas *head_zonas) {
         "- INFORMACIÓN\n"
         "[1] Los parámetros son: ID Zona objetivo, ID Atracción.\n"
         "[2] Deben estar separados por espacios.\n"
-        "[2] Por ejemplo: '3 23'\n\n"
+        "Por ejemplo: '3 23'\n\n"
 
         "=========================================================================\n\n"
     );
@@ -1694,11 +1695,11 @@ void menu_modificar_estado_atraccion(struct NodoZonas *head_zonas) {
         "=========================================================================\n\n");
     printf(
         "- INFORMACIÓN\n"
-        "[1] Los parámetros son: ID de Atracción, y nuevo estado.\n"
+        "[1] Los parámetros son: ID de Atracción, y Nuevo Estado.\n"
         "[2] Los estados posibles son: 'operativa', 'mantenimiento', 'cerrada' y,\n" 
         "'fuera_de_servicio'.\n"
         "[3] Todo debe estar en minúsculas y sin espacios.\n"
-        "[4] Por ejemplo: '42 mantenimiento'\n\n"
+        "Por ejemplo: '42 mantenimiento'\n\n"
 
         "=========================================================================\n\n"
     );

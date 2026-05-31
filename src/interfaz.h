@@ -1,11 +1,6 @@
 #ifndef INTERFAZ_H
 #define INTERFAZ_H
 
-extern int ENTRADA_GENERAL;
-extern int ENTRADA_INFANTIL;
-extern int ENTRADA_FAMILIAR;
-extern int ENTRADA_PRIORITARIA;
-
 int escoger_opcion(void);
 
 int menu_inicializar_parque(struct Parque *parque);
