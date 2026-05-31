@@ -423,7 +423,7 @@ void ver_filas_atracciones(struct NodoZonas *head_zonas) {
                            atr_act->datos->nombre ? atr_act->datos->nombre : "Sin Nombre",
                            duracion, cap_max);
 
-                    printf("  Prioritaria: ");
+                    printf("  Prioritaria : ");
                     act_fila = atr_act->datos->cola_prioritaria.frente;
                     primero = 1;
                     while (act_fila != NULL) {
@@ -441,7 +441,7 @@ void ver_filas_atracciones(struct NodoZonas *head_zonas) {
                     }
                     printf("\n");
 
-                    printf("  General    : ");
+                    printf("  General     : ");
                     act_fila = atr_act->datos->cola_general.frente;
                     primero = 1;
                     while (act_fila != NULL) {
