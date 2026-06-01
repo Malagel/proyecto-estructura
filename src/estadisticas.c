@@ -355,7 +355,6 @@ void ver_entradas_compradas(struct NodoEntradas *head_entradas) {
     return;
 }
 
-
 void ver_filas_atracciones(struct NodoZonas *head_zonas) {
     struct NodoZonas *zona_act;
     struct NodoAtraccion *atr_act;

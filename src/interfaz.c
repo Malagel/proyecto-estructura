@@ -220,7 +220,8 @@ void menu_comprar_entrada(struct NodoEntradas **entradas) {
         "[2] Deben escribirse en conjunto y separados por un espacio\n"
         "[3] Tipos de entrada: 'general', 'infantil', 'familiar', y 'prioritaria'\n"
         "[4] Comprar la entrada familiar permite el ingreso gratuito de hasta otros\n"
-        "    tres miembros. Por lo que la cantidad máxima es de 4.\n"
+        "    tres miembros por el precio de 1 entrada. Por lo que la cantidad máxima\n"
+        "    por esta entrada es 4.\n"
         "Por ejemplo: 'prioritaria 4'\n\n"
 
         "=========================================================================\n\n"
