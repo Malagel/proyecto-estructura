@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc 
 CFLAGS = -Wall -Wextra -ansi -pedantic -O2
 
 SRC_DIR = src
